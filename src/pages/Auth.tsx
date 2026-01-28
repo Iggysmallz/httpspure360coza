@@ -4,18 +4,58 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Mail, Lock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "@/hooks/use-toast";
 
 const Auth = () => {
   const navigate = useNavigate();
+  const { user, signIn, signUp } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (user) {
+      navigate("/bookings");
+    }
+  }, [user, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Auth logic will be implemented when we set up Supabase Auth
-    console.log("Auth:", { email, password, isLogin });
+    setIsLoading(true);
+
+    try {
+      const { error } = isLogin 
+        ? await signIn(email, password)
+        : await signUp(email, password);
+
+      if (error) {
+        toast({
+          title: isLogin ? "Sign in failed" : "Sign up failed",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: isLogin ? "Welcome back!" : "Account created!",
+          description: isLogin 
+            ? "You've successfully signed in." 
+            : "Your account has been created. You're now signed in.",
+        });
+        navigate("/bookings");
+      }
+    } catch (error) {
+      console.error("Auth error:", error);
+      toast({
+        title: "Something went wrong",
+        description: "Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -86,8 +126,10 @@ const Auth = () => {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full">
-                {isLogin ? "Sign In" : "Create Account"}
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading 
+                  ? (isLogin ? "Signing in..." : "Creating account...")
+                  : (isLogin ? "Sign In" : "Create Account")}
               </Button>
             </form>
 

@@ -14,7 +14,96 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      bookings: {
+        Row: {
+          bathrooms: number
+          bedrooms: number
+          created_at: string
+          id: string
+          scheduled_date: string
+          scheduled_time: string
+          service_type: string
+          status: string
+          total_price: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bathrooms?: number
+          bedrooms?: number
+          created_at?: string
+          id?: string
+          scheduled_date: string
+          scheduled_time: string
+          service_type: string
+          status?: string
+          total_price: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bathrooms?: number
+          bedrooms?: number
+          created_at?: string
+          id?: string
+          scheduled_date?: string
+          scheduled_time?: string
+          service_type?: string
+          status?: string
+          total_price?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      quote_requests: {
+        Row: {
+          care_type: string | null
+          created_at: string
+          dropoff_suburb: string | null
+          frequency: string | null
+          id: string
+          item_description: string | null
+          photo_url: string | null
+          pickup_suburb: string | null
+          service_type: string
+          special_requirements: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          care_type?: string | null
+          created_at?: string
+          dropoff_suburb?: string | null
+          frequency?: string | null
+          id?: string
+          item_description?: string | null
+          photo_url?: string | null
+          pickup_suburb?: string | null
+          service_type: string
+          special_requirements?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          care_type?: string | null
+          created_at?: string
+          dropoff_suburb?: string | null
+          frequency?: string | null
+          id?: string
+          item_description?: string | null
+          photo_url?: string | null
+          pickup_suburb?: string | null
+          service_type?: string
+          special_requirements?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
