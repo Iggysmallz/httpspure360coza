@@ -2,6 +2,7 @@ import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import CleaningWizard from "@/components/cleaning/CleaningWizard";
 
 const Cleaning = () => {
   const navigate = useNavigate();
@@ -9,7 +10,7 @@ const Cleaning = () => {
   return (
     <Layout>
       <div className="px-4 py-6 sm:px-6">
-        <div className="mx-auto max-w-4xl">
+        <div className="mx-auto max-w-lg">
           <Button 
             variant="ghost" 
             size="sm" 
@@ -20,13 +21,8 @@ const Cleaning = () => {
             Back
           </Button>
           
-          <div className="text-center py-12">
-            <h1 className="text-2xl font-bold text-foreground mb-4">
-              Cleaning Services
-            </h1>
-            <p className="text-muted-foreground">
-              Booking wizard coming soon...
-            </p>
+          <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
+            <CleaningWizard />
           </div>
         </div>
       </div>
