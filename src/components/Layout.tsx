@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import Header from "./Header";
 import BottomNav from "./BottomNav";
+import ChatBot from "./ChatBot";
 
 interface LayoutProps {
   children: ReactNode;
@@ -15,6 +16,7 @@ const Layout = ({ children, showBottomNav = true }: LayoutProps) => {
         {children}
       </main>
       {showBottomNav && <BottomNav />}
+      <ChatBot />
     </div>
   );
 };
