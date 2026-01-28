@@ -3,6 +3,8 @@ import { SprayCan, Truck, Heart } from "lucide-react";
 import Layout from "@/components/Layout";
 import Hero from "@/components/Hero";
 import ServiceCard from "@/components/ServiceCard";
+import ContactSection from "@/components/ContactSection";
+import WhatsAppButton from "@/components/WhatsAppButton";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -87,6 +89,9 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Contact Section */}
+      <ContactSection />
+
       {/* Footer */}
       <footer className="border-t border-border bg-background px-4 py-8 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
@@ -104,6 +109,9 @@ const Index = () => {
           </p>
         </div>
       </footer>
+
+      {/* Floating WhatsApp Button */}
+      <WhatsAppButton />
     </Layout>
   );
 };
