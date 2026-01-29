@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Cleaning from "./pages/Cleaning";
 import Removals from "./pages/Removals";
@@ -12,6 +13,10 @@ import Bookings from "./pages/Bookings";
 import Profile from "./pages/Profile";
 import Auth from "./pages/Auth";
 import Admin from "./pages/Admin";
+import ClientDashboard from "./pages/ClientDashboard";
+import WorkerDashboard from "./pages/WorkerDashboard";
+import CompleteProfile from "./pages/CompleteProfile";
+import PendingApproval from "./pages/PendingApproval";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,14 +30,60 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            
+            {/* Client Routes */}
+            <Route 
+              path="/client-dashboard" 
+              element={
+                <ProtectedRoute allowedRoles={["client"]}>
+                  <ClientDashboard />
+                </ProtectedRoute>
+              } 
+            />
             <Route path="/cleaning" element={<Cleaning />} />
             <Route path="/removals" element={<Removals />} />
             <Route path="/care" element={<Care />} />
             <Route path="/bookings" element={<Bookings />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/admin" element={<Admin />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            
+            {/* Worker Routes */}
+            <Route 
+              path="/worker-dashboard" 
+              element={
+                <ProtectedRoute allowedRoles={["worker"]} requireProfileComplete>
+                  <WorkerDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/complete-profile" 
+              element={
+                <ProtectedRoute allowedRoles={["worker"]}>
+                  <CompleteProfile />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/pending-approval" 
+              element={
+                <ProtectedRoute allowedRoles={["worker"]}>
+                  <PendingApproval />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Admin Routes */}
+            <Route 
+              path="/admin" 
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <Admin />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Catch-all */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
