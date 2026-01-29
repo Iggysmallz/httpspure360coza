@@ -6,19 +6,28 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User, Shield, CalendarCheck, LogOut, ChevronDown } from "lucide-react";
+import { User, Shield, CalendarCheck, LogOut, ChevronDown, Briefcase } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminRole } from "@/hooks/useAdminRole";
+import { useUserRole } from "@/hooks/useProfile";
+import logo from "@/assets/logo.png";
 
 const Header = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { isAdmin } = useAdminRole();
+  const { data: userRole } = useUserRole();
 
   const handleSignOut = async () => {
     await signOut();
     navigate("/");
+  };
+
+  const getDashboardPath = () => {
+    if (isAdmin) return "/admin";
+    if (userRole === "worker") return "/worker-dashboard";
+    return "/client-dashboard";
   };
 
   return (
@@ -29,13 +38,7 @@ const Header = () => {
           onClick={() => navigate("/")}
           className="flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg"
         >
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
-            <span className="text-lg font-bold text-primary-foreground">P</span>
-          </div>
-          <div className="hidden sm:block">
-            <span className="text-lg font-bold text-foreground">Pure</span>
-            <span className="text-lg font-bold text-primary">360</span>
-          </div>
+          <img src={logo} alt="Pure360" className="h-10 w-auto" />
         </button>
 
         {/* Desktop Navigation */}
@@ -85,9 +88,12 @@ const Header = () => {
                   <User className="mr-2 h-4 w-4" />
                   Profile
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/bookings")} className="cursor-pointer">
-                  <CalendarCheck className="mr-2 h-4 w-4" />
-                  My Bookings
+                <DropdownMenuItem onClick={() => navigate(getDashboardPath())} className="cursor-pointer">
+                  {userRole === "worker" ? (
+                    <><Briefcase className="mr-2 h-4 w-4" />My Dashboard</>
+                  ) : (
+                    <><CalendarCheck className="mr-2 h-4 w-4" />My Bookings</>
+                  )}
                 </DropdownMenuItem>
                 {isAdmin && (
                   <>

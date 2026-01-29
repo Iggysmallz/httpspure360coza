@@ -56,6 +56,51 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          address: string | null
+          created_at: string
+          first_name: string
+          id: string
+          last_name: string
+          latitude: number | null
+          longitude: number | null
+          profile_completed: boolean | null
+          profile_picture_url: string | null
+          updated_at: string
+          user_id: string
+          worker_status: Database["public"]["Enums"]["worker_status"] | null
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          first_name: string
+          id?: string
+          last_name: string
+          latitude?: number | null
+          longitude?: number | null
+          profile_completed?: boolean | null
+          profile_picture_url?: string | null
+          updated_at?: string
+          user_id: string
+          worker_status?: Database["public"]["Enums"]["worker_status"] | null
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          latitude?: number | null
+          longitude?: number | null
+          profile_completed?: boolean | null
+          profile_picture_url?: string | null
+          updated_at?: string
+          user_id?: string
+          worker_status?: Database["public"]["Enums"]["worker_status"] | null
+        }
+        Relationships: []
+      }
       quote_requests: {
         Row: {
           admin_notes: string | null
@@ -142,7 +187,8 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "moderator" | "user"
+      app_role: "admin" | "moderator" | "user" | "client" | "worker"
+      worker_status: "pending_approval" | "approved" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -270,7 +316,8 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "moderator", "user"],
+      app_role: ["admin", "moderator", "user", "client", "worker"],
+      worker_status: ["pending_approval", "approved", "rejected"],
     },
   },
 } as const
