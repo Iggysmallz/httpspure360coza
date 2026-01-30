@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MapPin, AlertCircle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AddressAutocompleteProps {
   value: string;
@@ -18,6 +19,7 @@ const AddressAutocomplete = ({ value, onChange, error, required }: AddressAutoco
   const inputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const [isGoogleLoaded, setIsGoogleLoaded] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const handlePlaceChanged = useCallback(() => {
     const place = autocompleteRef.current?.getPlace();
@@ -37,25 +39,37 @@ const AddressAutocomplete = ({ value, onChange, error, required }: AddressAutoco
       return;
     }
 
-    // Load Google Maps Script
-    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-    if (!apiKey) {
-      console.warn("Google Maps API key not configured");
-      return;
-    }
-
     const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
     if (existingScript) {
       existingScript.addEventListener("load", () => setIsGoogleLoaded(true));
       return;
     }
 
-    const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
-    script.async = true;
-    script.defer = true;
-    script.onload = () => setIsGoogleLoaded(true);
-    document.head.appendChild(script);
+    // Fetch API key from edge function
+    const loadGoogleMaps = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke("get-maps-api-key");
+        
+        if (error || !data?.apiKey) {
+          setLoadError("Address autocomplete unavailable");
+          console.error("Failed to load Google Maps API key:", error || "No API key returned");
+          return;
+        }
+
+        const script = document.createElement("script");
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${data.apiKey}&libraries=places`;
+        script.async = true;
+        script.defer = true;
+        script.onload = () => setIsGoogleLoaded(true);
+        script.onerror = () => setLoadError("Failed to load Google Maps");
+        document.head.appendChild(script);
+      } catch (err) {
+        setLoadError("Address autocomplete unavailable");
+        console.error("Error fetching Maps API key:", err);
+      }
+    };
+
+    loadGoogleMaps();
   }, []);
 
   useEffect(() => {
@@ -111,7 +125,12 @@ const AddressAutocomplete = ({ value, onChange, error, required }: AddressAutoco
           {error}
         </p>
       )}
-      {!isGoogleLoaded && (
+      {loadError && (
+        <p className="text-xs text-muted-foreground">
+          {loadError}
+        </p>
+      )}
+      {!isGoogleLoaded && !loadError && (
         <p className="text-xs text-muted-foreground">
           Loading address autocomplete...
         </p>
