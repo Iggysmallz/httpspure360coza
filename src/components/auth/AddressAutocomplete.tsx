@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Search, AlertCircle } from "lucide-react";
+import { Search, AlertCircle, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface AddressAutocompleteProps {
@@ -13,6 +13,44 @@ interface AddressAutocompleteProps {
   required?: boolean;
 }
 
+// Validate manual address entry
+const validateManualAddress = (address: string): { isValid: boolean; error: string | null } => {
+  const trimmed = address.trim();
+  
+  // Minimum length check
+  if (trimmed.length < 10) {
+    return { isValid: false, error: "Address is too short. Please enter a complete address." };
+  }
+  
+  // Maximum length check
+  if (trimmed.length > 300) {
+    return { isValid: false, error: "Address is too long. Please shorten it." };
+  }
+  
+  // Must contain at least one number (street number)
+  if (!/\d/.test(trimmed)) {
+    return { isValid: false, error: "Please include a street number in your address." };
+  }
+  
+  // Must contain at least one letter
+  if (!/[a-zA-Z]/.test(trimmed)) {
+    return { isValid: false, error: "Please include a street name in your address." };
+  }
+  
+  // Should have at least 2 words (street number + name)
+  const words = trimmed.split(/\s+/).filter(w => w.length > 0);
+  if (words.length < 2) {
+    return { isValid: false, error: "Please enter a more complete address (e.g., 123 Main Street, City)." };
+  }
+  
+  // Check for potentially harmful characters (basic sanitization)
+  if (/[<>{}[\]\\]/.test(trimmed)) {
+    return { isValid: false, error: "Address contains invalid characters." };
+  }
+  
+  return { isValid: true, error: null };
+};
+
 const AddressAutocomplete = ({ value, onChange, error, required }: AddressAutocompleteProps) => {
   const [inputValue, setInputValue] = useState(value);
   const [isValidSelection, setIsValidSelection] = useState(!!value);
@@ -21,7 +59,7 @@ const AddressAutocomplete = ({ value, onChange, error, required }: AddressAutoco
   const [isGoogleLoaded, setIsGoogleLoaded] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [isManualMode, setIsManualMode] = useState(false);
-
+  const [manualValidationError, setManualValidationError] = useState<string | null>(null);
   const handlePlaceChanged = useCallback(() => {
     const place = autocompleteRef.current?.getPlace();
     if (place?.formatted_address && place.geometry?.location) {
@@ -88,27 +126,42 @@ const AddressAutocomplete = ({ value, onChange, error, required }: AddressAutoco
   }, [isGoogleLoaded, handlePlaceChanged]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
+    const newValue = e.target.value;
+    setInputValue(newValue);
+    
     if (isManualMode) {
-      // In manual mode, accept the address as valid
-      setIsValidSelection(!!e.target.value.trim());
-      onChange(e.target.value, null, null);
+      // In manual mode, validate the address
+      const validation = validateManualAddress(newValue);
+      setManualValidationError(validation.error);
+      setIsValidSelection(validation.isValid);
+      
+      if (validation.isValid) {
+        onChange(newValue, null, null);
+      } else {
+        // Still update the value but mark as invalid
+        onChange(newValue, null, null);
+      }
     } else {
       setIsValidSelection(false);
+      setManualValidationError(null);
       // Clear lat/lng when user types manually
-      onChange(e.target.value, null, null);
+      onChange(newValue, null, null);
     }
   };
 
   const enableManualMode = () => {
     setIsManualMode(true);
     if (inputValue.trim()) {
-      setIsValidSelection(true);
+      const validation = validateManualAddress(inputValue);
+      setManualValidationError(validation.error);
+      setIsValidSelection(validation.isValid);
       onChange(inputValue, null, null);
     }
   };
 
   const showValidationError = !isManualMode && inputValue && !isValidSelection;
+  const showManualValidationError = isManualMode && manualValidationError && inputValue;
+  const showManualSuccess = isManualMode && isValidSelection && inputValue && !manualValidationError;
 
   return (
     <div className="space-y-2">
@@ -177,9 +230,21 @@ const AddressAutocomplete = ({ value, onChange, error, required }: AddressAutoco
           Loading address autocomplete...
         </p>
       )}
-      {isManualMode && (
+      {showManualValidationError && (
+        <p className="flex items-center gap-1 text-xs text-destructive">
+          <AlertCircle className="h-3 w-3" />
+          {manualValidationError}
+        </p>
+      )}
+      {showManualSuccess && (
+        <p className="flex items-center gap-1 text-xs text-primary">
+          <CheckCircle2 className="h-3 w-3" />
+          Address format looks good (coordinates unavailable in manual mode)
+        </p>
+      )}
+      {isManualMode && !inputValue && (
         <p className="text-xs text-muted-foreground">
-          Manual entry mode - coordinates will not be available
+          Enter your full address including street number, street name, and city
         </p>
       )}
     </div>
