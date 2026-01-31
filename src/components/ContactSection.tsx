@@ -107,7 +107,9 @@ const ContactSection = () => {
           <h3 className="mb-4 font-semibold text-foreground">Follow Us</h3>
           <div className="flex justify-center gap-4">
             <a 
-              href="#" 
+              href="https://www.facebook.com/profile.php?id=61586841514500" 
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors"
               aria-label="Facebook"
             >
@@ -116,7 +118,9 @@ const ContactSection = () => {
               </svg>
             </a>
             <a 
-              href="#" 
+              href="https://www.tiktok.com/@pure360s" 
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex h-10 w-10 items-center justify-center rounded-full bg-black text-white hover:bg-gray-800 transition-colors"
               aria-label="TikTok"
             >
