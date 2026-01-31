@@ -20,6 +20,7 @@ const AddressAutocomplete = ({ value, onChange, error, required }: AddressAutoco
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const [isGoogleLoaded, setIsGoogleLoaded] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [isManualMode, setIsManualMode] = useState(false);
 
   const handlePlaceChanged = useCallback(() => {
     const place = autocompleteRef.current?.getPlace();
@@ -88,12 +89,26 @@ const AddressAutocomplete = ({ value, onChange, error, required }: AddressAutoco
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
-    setIsValidSelection(false);
-    // Clear lat/lng when user types manually
-    onChange(e.target.value, null, null);
+    if (isManualMode) {
+      // In manual mode, accept the address as valid
+      setIsValidSelection(!!e.target.value.trim());
+      onChange(e.target.value, null, null);
+    } else {
+      setIsValidSelection(false);
+      // Clear lat/lng when user types manually
+      onChange(e.target.value, null, null);
+    }
   };
 
-  const showValidationError = inputValue && !isValidSelection;
+  const enableManualMode = () => {
+    setIsManualMode(true);
+    if (inputValue.trim()) {
+      setIsValidSelection(true);
+      onChange(inputValue, null, null);
+    }
+  };
+
+  const showValidationError = !isManualMode && inputValue && !isValidSelection;
 
   return (
     <div className="space-y-2">
@@ -121,10 +136,19 @@ const AddressAutocomplete = ({ value, onChange, error, required }: AddressAutoco
         />
       </div>
       {showValidationError && (
-        <p className="flex items-center gap-1 text-xs text-destructive">
-          <AlertCircle className="h-3 w-3" />
-          Please select an address from the dropdown
-        </p>
+        <div className="space-y-1">
+          <p className="flex items-center gap-1 text-xs text-destructive">
+            <AlertCircle className="h-3 w-3" />
+            Please select an address from the dropdown
+          </p>
+          <button
+            type="button"
+            onClick={enableManualMode}
+            className="text-xs text-primary hover:underline"
+          >
+            Or enter address manually
+          </button>
+        </div>
       )}
       {error && (
         <p className="flex items-center gap-1 text-xs text-destructive">
@@ -133,13 +157,29 @@ const AddressAutocomplete = ({ value, onChange, error, required }: AddressAutoco
         </p>
       )}
       {loadError && (
-        <p className="text-xs text-muted-foreground">
-          {loadError}
-        </p>
+        <div className="space-y-1">
+          <p className="text-xs text-muted-foreground">
+            {loadError}
+          </p>
+          {!isManualMode && (
+            <button
+              type="button"
+              onClick={enableManualMode}
+              className="text-xs text-primary hover:underline"
+            >
+              Enter address manually instead
+            </button>
+          )}
+        </div>
       )}
       {!isGoogleLoaded && !loadError && (
         <p className="text-xs text-muted-foreground">
           Loading address autocomplete...
+        </p>
+      )}
+      {isManualMode && (
+        <p className="text-xs text-muted-foreground">
+          Manual entry mode - coordinates will not be available
         </p>
       )}
     </div>

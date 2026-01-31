@@ -85,10 +85,10 @@ const CompleteProfile = () => {
       return;
     }
 
-    if (!address || !latitude || !longitude) {
+    if (!address) {
       toast({
-        title: "Invalid address",
-        description: "Please select a valid address from the dropdown.",
+        title: "Missing address",
+        description: "Please enter your address.",
         variant: "destructive",
       });
       return;
