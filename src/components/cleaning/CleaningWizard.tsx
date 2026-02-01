@@ -255,7 +255,9 @@ const CleaningWizard = () => {
                 >
                   <div className={cn(
                     "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg",
-                    serviceType === service.id ? "bg-primary text-primary-foreground" : "bg-muted"
+                    serviceType === service.id 
+                      ? "bg-primary text-primary-foreground" 
+                      : "bg-primary/10 text-primary"
                   )}>
                     <service.icon className="h-5 w-5" />
                   </div>
@@ -288,7 +290,9 @@ const CleaningWizard = () => {
                 >
                   <div className={cn(
                     "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg",
-                    serviceType === service.id ? "bg-primary text-primary-foreground" : "bg-muted"
+                    serviceType === service.id 
+                      ? "bg-[hsl(var(--quote-service))] text-white" 
+                      : "bg-[hsl(var(--quote-service-light))] text-[hsl(var(--quote-service-foreground))]"
                   )}>
                     <service.icon className="h-5 w-5" />
                   </div>
