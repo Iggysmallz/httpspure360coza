@@ -12,7 +12,7 @@ const Index = () => {
   const services = [
     {
       title: "Cleaning Services",
-      description: "Professional home cleaning with flexible packages. Book regular, deep clean, or AirBnB turnover services.",
+      description: "13 cleaning options including home, office, commercial, window cleaning & more. R15 cheaper than competitors!",
       icon: SprayCan,
       path: "/cleaning",
     },
