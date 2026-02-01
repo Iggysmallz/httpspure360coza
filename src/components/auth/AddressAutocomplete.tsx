@@ -84,9 +84,18 @@ const AddressAutocomplete = ({ value, onChange, error, required }: AddressAutoco
       return;
     }
 
-    // Fetch API key from edge function
+    // Fetch API key from edge function (requires authenticated user)
     const loadGoogleMaps = async () => {
       try {
+        // Check if user is authenticated first
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          // No authenticated user - enable manual mode silently
+          setIsManualMode(true);
+          setLoadError(null);
+          return;
+        }
+
         const { data, error } = await supabase.functions.invoke("get-maps-api-key");
         
         if (error || !data?.apiKey) {
