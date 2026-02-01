@@ -110,6 +110,13 @@ const CompleteProfile = () => {
         first_name: firstName.trim(),
         last_name: lastName.trim(),
         address: addressData.fullAddress,
+        unit_number: addressData.unitNumber || null,
+        complex_name: addressData.complexName || null,
+        street_address: addressData.streetAddress || null,
+        suburb: addressData.suburb || null,
+        city: addressData.city || null,
+        province: addressData.province || null,
+        postal_code: addressData.postalCode || null,
         latitude: addressData.latitude,
         longitude: addressData.longitude,
         profile_picture_url: uploadedUrl,
@@ -201,7 +208,18 @@ const CompleteProfile = () => {
 
               {/* Address */}
               <AddressForm
-                initialData={profile?.address ? { fullAddress: profile.address } : undefined}
+                initialData={profile ? {
+                  unitNumber: profile.unit_number || "",
+                  complexName: profile.complex_name || "",
+                  streetAddress: profile.street_address || "",
+                  suburb: profile.suburb || "",
+                  city: profile.city || "",
+                  province: profile.province || "",
+                  postalCode: profile.postal_code || "",
+                  latitude: profile.latitude,
+                  longitude: profile.longitude,
+                  fullAddress: profile.address || "",
+                } : undefined}
                 onChange={handleAddressChange}
                 required
               />
