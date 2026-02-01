@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
@@ -6,10 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Upload, User, Camera } from "lucide-react";
+import { User, Camera } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
-import AddressAutocomplete from "@/components/auth/AddressAutocomplete";
+import AddressForm, { AddressData } from "@/components/auth/AddressForm";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
@@ -20,20 +20,18 @@ const CompleteProfile = () => {
 
   const [firstName, setFirstName] = useState(profile?.first_name || "");
   const [lastName, setLastName] = useState(profile?.last_name || "");
-  const [address, setAddress] = useState(profile?.address || "");
-  const [latitude, setLatitude] = useState<number | null>(profile?.latitude || null);
-  const [longitude, setLongitude] = useState<number | null>(profile?.longitude || null);
+  const [addressData, setAddressData] = useState<AddressData | null>(null);
+  const [isAddressValid, setIsAddressValid] = useState(false);
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [profilePictureUrl, setProfilePictureUrl] = useState(profile?.profile_picture_url || "");
   const [isLoading, setIsLoading] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleAddressChange = (addr: string, lat: number | null, lng: number | null) => {
-    setAddress(addr);
-    setLatitude(lat);
-    setLongitude(lng);
-  };
+  const handleAddressChange = useCallback((data: AddressData, isValid: boolean) => {
+    setAddressData(data);
+    setIsAddressValid(isValid);
+  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -85,10 +83,10 @@ const CompleteProfile = () => {
       return;
     }
 
-    if (!address) {
+    if (!addressData || !isAddressValid) {
       toast({
         title: "Missing address",
-        description: "Please enter your address.",
+        description: "Please complete all required address fields.",
         variant: "destructive",
       });
       return;
@@ -111,9 +109,9 @@ const CompleteProfile = () => {
       await updateProfile.mutateAsync({
         first_name: firstName.trim(),
         last_name: lastName.trim(),
-        address,
-        latitude,
-        longitude,
+        address: addressData.fullAddress,
+        latitude: addressData.latitude,
+        longitude: addressData.longitude,
         profile_picture_url: uploadedUrl,
         profile_completed: true,
       });
@@ -202,8 +200,8 @@ const CompleteProfile = () => {
               </div>
 
               {/* Address */}
-              <AddressAutocomplete
-                value={address}
+              <AddressForm
+                initialData={profile?.address ? { fullAddress: profile.address } : undefined}
                 onChange={handleAddressChange}
                 required
               />
