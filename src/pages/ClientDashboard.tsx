@@ -15,7 +15,7 @@ const ClientDashboard = () => {
   const services = [
     {
       title: "Cleaning",
-      description: "Book a professional cleaning service",
+      description: "13 services including home, office, commercial & more",
       icon: Sparkles,
       href: "/cleaning",
       color: "text-primary",
