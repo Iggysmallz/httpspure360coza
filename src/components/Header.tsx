@@ -69,48 +69,55 @@ const Header = () => {
           )}
           
           {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-2 rounded-lg font-medium"
-                >
-                  <User className="h-4 w-4" />
-                  <span className="hidden sm:inline max-w-[120px] truncate">
-                    {user.email?.split('@')[0] || 'Account'}
-                  </span>
-                  <ChevronDown className="h-3 w-3" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48 bg-background z-50">
-                <DropdownMenuItem onClick={() => navigate("/profile")} className="cursor-pointer">
-                  <User className="mr-2 h-4 w-4" />
-                  Profile
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate(getDashboardPath())} className="cursor-pointer">
-                  {userRole === "worker" ? (
-                    <><Briefcase className="mr-2 h-4 w-4" />My Dashboard</>
-                  ) : (
-                    <><CalendarCheck className="mr-2 h-4 w-4" />My Bookings</>
+            <div className="flex items-center gap-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-2 rounded-lg font-medium"
+                  >
+                    <User className="h-4 w-4" />
+                    <span className="hidden sm:inline max-w-[120px] truncate">
+                      {user.email?.split('@')[0] || 'Account'}
+                    </span>
+                    <ChevronDown className="h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48 bg-background z-50">
+                  <DropdownMenuItem onClick={() => navigate("/profile")} className="cursor-pointer">
+                    <User className="mr-2 h-4 w-4" />
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate(getDashboardPath())} className="cursor-pointer">
+                    {userRole === "worker" ? (
+                      <><Briefcase className="mr-2 h-4 w-4" />My Dashboard</>
+                    ) : (
+                      <><CalendarCheck className="mr-2 h-4 w-4" />My Bookings</>
+                    )}
+                  </DropdownMenuItem>
+                  {isAdmin && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => navigate("/admin")} className="cursor-pointer">
+                        <Shield className="mr-2 h-4 w-4" />
+                        Admin Panel
+                      </DropdownMenuItem>
+                    </>
                   )}
-                </DropdownMenuItem>
-                {isAdmin && (
-                  <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => navigate("/admin")} className="cursor-pointer">
-                      <Shield className="mr-2 h-4 w-4" />
-                      Admin Panel
-                    </DropdownMenuItem>
-                  </>
-                )}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-destructive focus:text-destructive">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Sign Out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleSignOut}
+                className="text-destructive hover:text-destructive hover:bg-destructive/10"
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="hidden sm:inline ml-1.5">Logout</span>
+              </Button>
+            </div>
           ) : (
             <Button
               onClick={() => navigate("/auth")}
