@@ -8,8 +8,8 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { 
   CalendarIcon, Sparkles, Home, Clock, Check, ArrowLeft, ArrowRight,
-  Truck, TreePine, Building2, Shirt, Zap, BedDouble, Droplets, 
-  Building, Briefcase, LucideIcon
+  Truck, Leaf, Building2, Shirt, Zap, CalendarCheck, Droplets, 
+  Factory, Store, Flower2, Key, LucideIcon
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -29,18 +29,18 @@ const SERVICE_TYPES: ServiceType[] = [
   // Instant Book Services
   { id: "indoor_cleaning", name: "Indoor Cleaning", description: "3.5-10 hours comprehensive home cleaning", icon: Home, isQuoteBased: false },
   { id: "deep_clean", name: "Deep Cleaning", description: "Thorough top-to-bottom intensive cleaning", icon: Sparkles, isQuoteBased: false },
-  { id: "airbnb", name: "AirBnB Turnover", description: "Quick turnaround for short-term rentals", icon: Clock, isQuoteBased: false },
+  { id: "airbnb", name: "AirBnB Turnover", description: "Quick turnaround for short-term rentals", icon: Key, isQuoteBased: false },
   { id: "express_cleaning", name: "Express Cleaning", description: "1-3 hour quick cleaning tasks", icon: Zap, isQuoteBased: false },
   { id: "moving_cleaning", name: "Moving Cleaning", description: "Move-in/move-out deep cleaning", icon: Truck, isQuoteBased: false, priceInfo: "From R235" },
-  { id: "one_time_cleaning", name: "One-Time Cleaning", description: "Single, flexible booking", icon: BedDouble, isQuoteBased: false, priceInfo: "From R235" },
+  { id: "one_time_cleaning", name: "One-Time Cleaning", description: "Single, flexible booking", icon: CalendarCheck, isQuoteBased: false, priceInfo: "From R235" },
   { id: "window_cleaning", name: "Window Cleaning", description: "Professional window cleaning", icon: Droplets, isQuoteBased: false, priceInfo: "R50/hour" },
   
   // Quote-Based Services
   { id: "office_cleaning", name: "Office Cleaning", description: "Half-day or full-day office cleaning", icon: Building2, isQuoteBased: true },
-  { id: "commercial_cleaning", name: "Commercial Cleaning", description: "Office and industrial spaces (R5.10/sqm)", icon: Building, isQuoteBased: true },
-  { id: "small_business_cleaning", name: "Small Business Cleaning", description: "Retail and small facility cleaning", icon: Briefcase, isQuoteBased: true },
-  { id: "outdoor_services", name: "Outdoor Services", description: "Garden maintenance and dog walking", icon: TreePine, isQuoteBased: true },
-  { id: "gardening", name: "Gardening Services", description: "Landscaping and irrigation", icon: TreePine, isQuoteBased: true },
+  { id: "commercial_cleaning", name: "Commercial Cleaning", description: "Office and industrial spaces (R5.10/sqm)", icon: Factory, isQuoteBased: true },
+  { id: "small_business_cleaning", name: "Small Business Cleaning", description: "Retail and small facility cleaning", icon: Store, isQuoteBased: true },
+  { id: "outdoor_services", name: "Outdoor Services", description: "Garden maintenance and dog walking", icon: Leaf, isQuoteBased: true },
+  { id: "gardening", name: "Gardening Services", description: "Landscaping and irrigation", icon: Flower2, isQuoteBased: true },
   { id: "laundry_ironing", name: "Laundry & Ironing", description: "Professional laundry services", icon: Shirt, isQuoteBased: true },
 ];
 
