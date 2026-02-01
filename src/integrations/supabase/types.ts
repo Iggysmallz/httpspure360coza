@@ -59,42 +59,63 @@ export type Database = {
       profiles: {
         Row: {
           address: string | null
+          city: string | null
+          complex_name: string | null
           created_at: string
           first_name: string
           id: string
           last_name: string
           latitude: number | null
           longitude: number | null
+          postal_code: string | null
           profile_completed: boolean | null
           profile_picture_url: string | null
+          province: string | null
+          street_address: string | null
+          suburb: string | null
+          unit_number: string | null
           updated_at: string
           user_id: string
           worker_status: Database["public"]["Enums"]["worker_status"] | null
         }
         Insert: {
           address?: string | null
+          city?: string | null
+          complex_name?: string | null
           created_at?: string
           first_name: string
           id?: string
           last_name: string
           latitude?: number | null
           longitude?: number | null
+          postal_code?: string | null
           profile_completed?: boolean | null
           profile_picture_url?: string | null
+          province?: string | null
+          street_address?: string | null
+          suburb?: string | null
+          unit_number?: string | null
           updated_at?: string
           user_id: string
           worker_status?: Database["public"]["Enums"]["worker_status"] | null
         }
         Update: {
           address?: string | null
+          city?: string | null
+          complex_name?: string | null
           created_at?: string
           first_name?: string
           id?: string
           last_name?: string
           latitude?: number | null
           longitude?: number | null
+          postal_code?: string | null
           profile_completed?: boolean | null
           profile_picture_url?: string | null
+          province?: string | null
+          street_address?: string | null
+          suburb?: string | null
+          unit_number?: string | null
           updated_at?: string
           user_id?: string
           worker_status?: Database["public"]["Enums"]["worker_status"] | null
