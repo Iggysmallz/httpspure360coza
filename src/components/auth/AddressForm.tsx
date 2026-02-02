@@ -249,21 +249,69 @@ const AddressForm = ({ initialData, onChange, required = false }: AddressFormPro
         {/* Detailed Fields */}
         {isManual && (
           <Card className="border-border">
-            <CardContent className="pt-4 space-y-4">
-              {/* Unit & Complex */}
-              <div className="grid gap-4 sm:grid-cols-2">
+            <CardContent className="pt-4 space-y-6">
+              {/* UNIT INFO SECTION */}
+              <div className="space-y-3">
+                <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                  Unit Details
+                </h4>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="unit"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-1">
+                          Unit / Flat No. <span className="text-destructive">*</span>
+                          <span className="text-xs text-muted-foreground ml-1">(Use "1" for houses)</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="e.g., 12A"
+                            className="border-primary/50 focus:border-primary"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="complex"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Complex / Building Name
+                          <span className="text-xs text-muted-foreground ml-1">(for security gates)</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g., Sandton Heights" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
+              {/* LOCATION SECTION */}
+              <div className="space-y-3">
+                <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                  Location
+                </h4>
+                
                 <FormField
                   control={form.control}
-                  name="unit"
+                  name="street"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Unit / Flat No. *</FormLabel>
+                      <FormLabel>
+                        Street Number & Name <span className="text-destructive">*</span>
+                      </FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="e.g., 12A (use '1' for houses)"
-                          className="border-primary/50 focus:border-primary"
-                          {...field}
-                        />
+                        <Input placeholder="e.g., 123 Main Road" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -272,12 +320,15 @@ const AddressForm = ({ initialData, onChange, required = false }: AddressFormPro
 
                 <FormField
                   control={form.control}
-                  name="complex"
+                  name="suburb"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Complex Name (Optional)</FormLabel>
+                      <FormLabel className="flex items-center gap-1">
+                        Suburb <span className="text-destructive">*</span>
+                        <span className="text-xs text-muted-foreground ml-1">(for zone-based pricing)</span>
+                      </FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g., Sandton Heights" {...field} />
+                        <Input placeholder="e.g., Sandton" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -285,58 +336,71 @@ const AddressForm = ({ initialData, onChange, required = false }: AddressFormPro
                 />
               </div>
 
-              {/* Street */}
-              <FormField
-                control={form.control}
-                name="street"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Street Number & Name *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., 123 Main Road" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* CITY/PROVINCE SECTION */}
+              <div className="space-y-3">
+                <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                  City & Province
+                </h4>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="city"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          City <span className="text-destructive">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g., Johannesburg" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              {/* Suburb */}
-              <FormField
-                control={form.control}
-                name="suburb"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Suburb *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., Sandton" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                  <FormField
+                    control={form.control}
+                    name="province"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Province <span className="text-destructive">*</span>
+                        </FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="bg-background">
+                              <SelectValue placeholder="Select province" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="bg-background border z-50">
+                            {SA_PROVINCES.map((p) => (
+                              <SelectItem key={p} value={p}>
+                                {p}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
 
-              {/* City & Postal Code */}
-              <div className="grid gap-4 sm:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="city"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>City *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., Johannesburg" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
+              {/* ZIP SECTION */}
+              <div className="space-y-3">
+                <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                  Postal Code
+                </h4>
                 <FormField
                   control={form.control}
                   name="postalCode"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Postal Code *</FormLabel>
+                    <FormItem className="sm:w-1/2">
+                      <FormLabel>
+                        Postal Code <span className="text-destructive">*</span>
+                        <span className="text-xs text-muted-foreground ml-1">(4 digits)</span>
+                      </FormLabel>
                       <FormControl>
                         <Input
                           inputMode="numeric"
@@ -354,32 +418,6 @@ const AddressForm = ({ initialData, onChange, required = false }: AddressFormPro
                   )}
                 />
               </div>
-
-              {/* Province */}
-              <FormField
-                control={form.control}
-                name="province"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Province *</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="bg-background">
-                          <SelectValue placeholder="Select province" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className="bg-background border z-50">
-                        {SA_PROVINCES.map((p) => (
-                          <SelectItem key={p} value={p}>
-                            {p}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </CardContent>
           </Card>
         )}
