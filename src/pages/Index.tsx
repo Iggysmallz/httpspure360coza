@@ -34,9 +34,13 @@ const Index = () => {
     document.getElementById("services")?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const handleWorkWithUs = () => {
+    navigate("/auth?role=worker");
+  };
+
   return (
     <Layout>
-      <Hero onGetStarted={scrollToServices} />
+      <Hero onBookService={scrollToServices} onWorkWithUs={handleWorkWithUs} />
       
       {/* Services Section */}
       <section id="services" className="px-4 py-12 sm:px-6 lg:px-8">
