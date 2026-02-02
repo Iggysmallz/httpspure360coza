@@ -11,13 +11,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, MapPin, Building2, Home, ChevronDown, ChevronUp } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Search, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { mapGoogleAddressToSA } from "@/utils/addressMapper";
 
-// South African provinces
-const SA_PROVINCES = [
+const PROVINCES = [
   "Eastern Cape",
   "Free State",
   "Gauteng",
@@ -49,10 +49,8 @@ interface AddressFormProps {
 }
 
 const parseExistingAddress = (address: string): Partial<AddressData> => {
-  // Try to parse an existing address string into components
-  // This is a best-effort parse for addresses like "123 Main Street, Suburb, City, Province, 1234"
-  const parts = address.split(",").map(p => p.trim());
-  
+  const parts = address.split(",").map((p) => p.trim());
+
   if (parts.length >= 4) {
     return {
       streetAddress: parts[0] || "",
@@ -62,103 +60,113 @@ const parseExistingAddress = (address: string): Partial<AddressData> => {
       postalCode: parts[4] || "",
     };
   }
-  
+
   return { streetAddress: address };
 };
 
 const AddressForm = ({ initialData, onChange, required = false }: AddressFormProps) => {
-  // Parse initial address if it's a string
-  const parsedInitial = initialData?.fullAddress 
-    ? parseExistingAddress(initialData.fullAddress) 
+  const parsedInitial = initialData?.fullAddress
+    ? parseExistingAddress(initialData.fullAddress)
     : {};
-  
-  const [unitNumber, setUnitNumber] = useState(initialData?.unitNumber || "");
-  const [complexName, setComplexName] = useState(initialData?.complexName || "");
-  const [streetAddress, setStreetAddress] = useState(initialData?.streetAddress || parsedInitial.streetAddress || "");
-  const [suburb, setSuburb] = useState(initialData?.suburb || parsedInitial.suburb || "");
-  const [city, setCity] = useState(initialData?.city || parsedInitial.city || "");
-  const [province, setProvince] = useState(initialData?.province || parsedInitial.province || "");
-  const [postalCode, setPostalCode] = useState(initialData?.postalCode || parsedInitial.postalCode || "");
-  const [latitude, setLatitude] = useState<number | null>(initialData?.latitude || null);
-  const [longitude, setLongitude] = useState<number | null>(initialData?.longitude || null);
+
+  const [address, setAddress] = useState({
+    unit: initialData?.unitNumber || "",
+    complex: initialData?.complexName || "",
+    street: initialData?.streetAddress || parsedInitial.streetAddress || "",
+    suburb: initialData?.suburb || parsedInitial.suburb || "",
+    city: initialData?.city || parsedInitial.city || "",
+    province: initialData?.province || parsedInitial.province || "",
+    postalCode: initialData?.postalCode || parsedInitial.postalCode || "",
+  });
+
+  const [coordinates, setCoordinates] = useState<{
+    latitude: number | null;
+    longitude: number | null;
+  }>({
+    latitude: initialData?.latitude || null,
+    longitude: initialData?.longitude || null,
+  });
 
   const [searchValue, setSearchValue] = useState("");
-  const [isManualMode, setIsManualMode] = useState(false);
-  const [hasSelectedAddress, setHasSelectedAddress] = useState(
+  const [isManual, setIsManual] = useState(
     !!(initialData?.streetAddress || parsedInitial.streetAddress)
   );
-  const [showDetails, setShowDetails] = useState(hasSelectedAddress);
   const [isGoogleLoaded, setIsGoogleLoaded] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  const searchInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const unitInputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
 
   // Build full address string
   const buildFullAddress = useCallback(() => {
     const parts = [
-      unitNumber && `Unit ${unitNumber}`,
-      complexName,
-      streetAddress,
-      suburb,
-      city,
-      province,
-      postalCode,
+      address.unit && `Unit ${address.unit}`,
+      address.complex,
+      address.street,
+      address.suburb,
+      address.city,
+      address.province,
+      address.postalCode,
     ].filter(Boolean);
     return parts.join(", ");
-  }, [unitNumber, complexName, streetAddress, suburb, city, province, postalCode]);
+  }, [address]);
 
   // Validate form
   const validateForm = useCallback(() => {
     if (!required) return true;
-    
-    const hasStreet = streetAddress.trim().length > 0;
-    const hasSuburb = suburb.trim().length > 0;
-    const hasCity = city.trim().length > 0;
-    const hasProvince = province.trim().length > 0;
-    const validPostal = /^\d{4}$/.test(postalCode);
-    
+
+    const hasStreet = address.street.trim().length > 0;
+    const hasSuburb = address.suburb.trim().length > 0;
+    const hasCity = address.city.trim().length > 0;
+    const hasProvince = address.province.trim().length > 0;
+    const validPostal = /^\d{4}$/.test(address.postalCode);
+
     return hasStreet && hasSuburb && hasCity && hasProvince && validPostal;
-  }, [required, streetAddress, suburb, city, province, postalCode]);
+  }, [required, address]);
 
   // Notify parent of changes
   useEffect(() => {
     const data: AddressData = {
-      unitNumber,
-      complexName,
-      streetAddress,
-      suburb,
-      city,
-      province,
-      postalCode,
-      latitude,
-      longitude,
+      unitNumber: address.unit,
+      complexName: address.complex,
+      streetAddress: address.street,
+      suburb: address.suburb,
+      city: address.city,
+      province: address.province,
+      postalCode: address.postalCode,
+      latitude: coordinates.latitude,
+      longitude: coordinates.longitude,
       fullAddress: buildFullAddress(),
     };
     onChange(data, validateForm());
-  }, [unitNumber, complexName, streetAddress, suburb, city, province, postalCode, latitude, longitude, buildFullAddress, validateForm, onChange]);
+  }, [address, coordinates, buildFullAddress, validateForm, onChange]);
 
-  // Handle place selection from Google
+  // Handle place selection
   const handlePlaceChanged = useCallback(() => {
     const place = autocompleteRef.current?.getPlace();
     if (!place?.address_components || !place.geometry?.location) return;
 
-    const addressData = mapGoogleAddressToSA(place);
+    const mapped = mapGoogleAddressToSA(place);
 
-    // Update state
-    setStreetAddress(`${addressData.streetNumber} ${addressData.streetName}`.trim());
-    setSuburb(addressData.suburb || addressData.city);
-    setCity(addressData.city);
-    setProvince(addressData.province);
-    setPostalCode(addressData.postalCode);
-    setLatitude(addressData.latitude);
-    setLongitude(addressData.longitude);
-    setHasSelectedAddress(true);
-    setShowDetails(true);
-    setSearchValue(addressData.fullAddress);
+    setAddress((prev) => ({
+      ...prev,
+      street: `${mapped.streetNumber} ${mapped.streetName}`.trim(),
+      suburb: mapped.suburb || mapped.city,
+      city: mapped.city,
+      province: mapped.province,
+      postalCode: mapped.postalCode,
+    }));
 
-    // Focus unit number field for quick entry
+    setCoordinates({
+      latitude: mapped.latitude,
+      longitude: mapped.longitude,
+    });
+
+    setSearchValue(mapped.fullAddress);
+    setIsManual(true);
+
+    // Focus unit field for quick entry
     setTimeout(() => unitInputRef.current?.focus(), 100);
   }, []);
 
@@ -177,19 +185,19 @@ const AddressForm = ({ initialData, onChange, required = false }: AddressFormPro
 
     const loadGoogleMaps = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
         if (!session) {
-          setIsManualMode(true);
-          setShowDetails(true);
+          setIsManual(true);
           return;
         }
 
         const { data, error } = await supabase.functions.invoke("get-maps-api-key");
-        
+
         if (error || !data?.apiKey) {
           setLoadError("Address search unavailable");
-          setIsManualMode(true);
-          setShowDetails(true);
+          setIsManual(true);
           return;
         }
 
@@ -200,14 +208,12 @@ const AddressForm = ({ initialData, onChange, required = false }: AddressFormPro
         script.onload = () => setIsGoogleLoaded(true);
         script.onerror = () => {
           setLoadError("Failed to load address search");
-          setIsManualMode(true);
-          setShowDetails(true);
+          setIsManual(true);
         };
         document.head.appendChild(script);
-      } catch (err) {
+      } catch {
         setLoadError("Address search unavailable");
-        setIsManualMode(true);
-        setShowDetails(true);
+        setIsManual(true);
       }
     };
 
@@ -216,133 +222,100 @@ const AddressForm = ({ initialData, onChange, required = false }: AddressFormPro
 
   // Initialize autocomplete
   useEffect(() => {
-    if (!isGoogleLoaded || !searchInputRef.current || autocompleteRef.current || isManualMode) return;
+    if (!isGoogleLoaded || !inputRef.current || autocompleteRef.current) return;
     if (typeof google === "undefined" || !google?.maps?.places) return;
 
-    autocompleteRef.current = new google.maps.places.Autocomplete(searchInputRef.current, {
+    autocompleteRef.current = new google.maps.places.Autocomplete(inputRef.current, {
       types: ["address"],
       componentRestrictions: { country: "za" },
     });
 
     autocompleteRef.current.addListener("place_changed", handlePlaceChanged);
-  }, [isGoogleLoaded, isManualMode, handlePlaceChanged]);
+  }, [isGoogleLoaded, handlePlaceChanged]);
 
-  const handleManualToggle = () => {
-    setIsManualMode(true);
-    setShowDetails(true);
-  };
-
-  const handlePostalCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/\D/g, "").slice(0, 4);
-    setPostalCode(value);
+  const handlePostalCodeChange = (value: string) => {
+    const cleaned = value.replace(/\D/g, "").slice(0, 4);
+    setAddress((prev) => ({ ...prev, postalCode: cleaned }));
   };
 
   return (
     <div className="space-y-4">
-      {/* Google Search Bar - Only show if not in manual mode */}
-      {!isManualMode && (
-        <div className="space-y-2">
+      {/* Search Box */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
           <Label htmlFor="address-search" className="flex items-center gap-2">
             <Search className="h-4 w-4" />
-            Search Address
+            Where should we come?
             {required && <span className="text-destructive">*</span>}
           </Label>
-          <div className="relative">
-            <Input
-              ref={searchInputRef}
-              id="address-search"
-              type="text"
-              placeholder="Start typing your address..."
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              className="pr-10"
-            />
-            <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          </div>
-          
-          {!isGoogleLoaded && !loadError && (
-            <p className="text-xs text-muted-foreground">Loading address search...</p>
-          )}
-          
-          {loadError && (
-            <p className="text-xs text-muted-foreground">{loadError}</p>
-          )}
-          
-          <Button
-            type="button"
-            variant="link"
-            size="sm"
-            onClick={handleManualToggle}
-            className="h-auto p-0 text-xs"
-          >
-            Can't find it? Enter manually
-          </Button>
-        </div>
-      )}
-
-      {/* Unit & Complex Fields - Show after selection or in manual mode */}
-      {(hasSelectedAddress || isManualMode) && (
-        <div className="rounded-lg border bg-card p-4 space-y-4">
-          <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-            <Building2 className="h-4 w-4" />
-            Unit Details (Important for complexes/estates)
-          </div>
-          
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="unit-number" className="flex items-center gap-1">
-                <Home className="h-3 w-3" />
-                Unit / Flat Number
-              </Label>
-              <Input
-                ref={unitInputRef}
-                id="unit-number"
-                type="text"
-                placeholder="e.g., 12A, Unit 5"
-                value={unitNumber}
-                onChange={(e) => setUnitNumber(e.target.value)}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="complex-name">Complex / Building Name</Label>
-              <Input
-                id="complex-name"
-                type="text"
-                placeholder="e.g., Sandton Heights"
-                value={complexName}
-                onChange={(e) => setComplexName(e.target.value)}
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Expandable Address Details */}
-      {showDetails && (
-        <div className="space-y-4">
           <button
             type="button"
-            onClick={() => setShowDetails(!showDetails)}
-            className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-full"
+            onClick={() => setIsManual(!isManual)}
+            className="text-xs text-primary underline hover:text-primary/80"
           >
-            <MapPin className="h-4 w-4" />
-            Address Details
-            {showDetails ? <ChevronUp className="h-4 w-4 ml-auto" /> : <ChevronDown className="h-4 w-4 ml-auto" />}
+            {isManual ? "Hide details" : "Can't find it? Enter manually"}
           </button>
+        </div>
 
-          <div className="rounded-lg border bg-card p-4 space-y-4">
-            {/* Street Address */}
+        <div className="relative">
+          <Input
+            ref={inputRef}
+            id="address-search"
+            type="text"
+            placeholder="Start typing your address..."
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            className="pr-10"
+          />
+          <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        </div>
+
+        {!isGoogleLoaded && !loadError && (
+          <p className="text-xs text-muted-foreground">Loading address search...</p>
+        )}
+
+        {loadError && <p className="text-xs text-muted-foreground">{loadError}</p>}
+      </div>
+
+      {/* Detailed Fields */}
+      {isManual && (
+        <Card className="border-border">
+          <CardContent className="pt-4 space-y-4">
+            {/* Unit & Complex */}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="unit">Unit / Flat No.</Label>
+                <Input
+                  ref={unitInputRef}
+                  id="unit"
+                  placeholder="e.g., 12A"
+                  value={address.unit}
+                  onChange={(e) => setAddress({ ...address, unit: e.target.value })}
+                  className="border-primary/50 focus:border-primary focus:ring-primary"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="complex">Complex Name (Optional)</Label>
+                <Input
+                  id="complex"
+                  placeholder="e.g., Sandton Heights"
+                  value={address.complex}
+                  onChange={(e) => setAddress({ ...address, complex: e.target.value })}
+                />
+              </div>
+            </div>
+
+            {/* Street */}
             <div className="space-y-2">
-              <Label htmlFor="street-address">
+              <Label htmlFor="street">
                 Street Number & Name {required && <span className="text-destructive">*</span>}
               </Label>
               <Input
-                id="street-address"
-                type="text"
+                id="street"
                 placeholder="e.g., 123 Main Road"
-                value={streetAddress}
-                onChange={(e) => setStreetAddress(e.target.value)}
+                value={address.street}
+                onChange={(e) => setAddress({ ...address, street: e.target.value })}
                 required={required}
               />
             </div>
@@ -354,18 +327,14 @@ const AddressForm = ({ initialData, onChange, required = false }: AddressFormPro
               </Label>
               <Input
                 id="suburb"
-                type="text"
                 placeholder="e.g., Sandton"
-                value={suburb}
-                onChange={(e) => setSuburb(e.target.value)}
+                value={address.suburb}
+                onChange={(e) => setAddress({ ...address, suburb: e.target.value })}
                 required={required}
               />
-              <p className="text-xs text-muted-foreground">
-                Important for zone-based pricing
-              </p>
             </div>
 
-            {/* City & Province */}
+            {/* City & Postal Code */}
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="city">
@@ -373,69 +342,61 @@ const AddressForm = ({ initialData, onChange, required = false }: AddressFormPro
                 </Label>
                 <Input
                   id="city"
-                  type="text"
                   placeholder="e.g., Johannesburg"
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
+                  value={address.city}
+                  onChange={(e) => setAddress({ ...address, city: e.target.value })}
                   required={required}
                 />
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="province">
-                  Province {required && <span className="text-destructive">*</span>}
-                </Label>
-                <Select value={province} onValueChange={setProvince}>
-                  <SelectTrigger id="province">
-                    <SelectValue placeholder="Select province" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {SA_PROVINCES.map((prov) => (
-                      <SelectItem key={prov} value={prov}>
-                        {prov}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
 
-            {/* Postal Code */}
-            <div className="sm:w-1/2">
               <div className="space-y-2">
-                <Label htmlFor="postal-code">
+                <Label htmlFor="postalCode">
                   Postal Code {required && <span className="text-destructive">*</span>}
                 </Label>
                 <Input
-                  id="postal-code"
-                  type="text"
+                  id="postalCode"
                   inputMode="numeric"
                   pattern="\d{4}"
                   maxLength={4}
                   placeholder="e.g., 2196"
-                  value={postalCode}
-                  onChange={handlePostalCodeChange}
+                  value={address.postalCode}
+                  onChange={(e) => handlePostalCodeChange(e.target.value)}
                   required={required}
                   className={cn(
-                    postalCode && postalCode.length !== 4 && "border-destructive"
+                    address.postalCode &&
+                      address.postalCode.length !== 4 &&
+                      "border-destructive"
                   )}
                 />
-                {postalCode && postalCode.length !== 4 && (
-                  <p className="text-xs text-destructive">
-                    Postal code must be 4 digits
-                  </p>
+                {address.postalCode && address.postalCode.length !== 4 && (
+                  <p className="text-xs text-destructive">Postal code must be 4 digits</p>
                 )}
               </div>
             </div>
-          </div>
-        </div>
-      )}
 
-      {/* Manual mode indicator */}
-      {isManualMode && (
-        <p className="text-xs text-muted-foreground">
-          Enter your full address manually below
-        </p>
+            {/* Province */}
+            <div className="space-y-2">
+              <Label htmlFor="province">
+                Province {required && <span className="text-destructive">*</span>}
+              </Label>
+              <Select
+                value={address.province}
+                onValueChange={(v) => setAddress({ ...address, province: v })}
+              >
+                <SelectTrigger id="province" className="bg-background">
+                  <SelectValue placeholder="Select province" />
+                </SelectTrigger>
+                <SelectContent className="bg-background border z-50">
+                  {PROVINCES.map((p) => (
+                    <SelectItem key={p} value={p}>
+                      {p}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );
