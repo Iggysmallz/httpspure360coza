@@ -70,7 +70,7 @@ const Index = () => {
   };
 
   const handleWorkWithUs = () => {
-    navigate("/auth?role=worker");
+    navigate("/work-with-us");
   };
 
   return (

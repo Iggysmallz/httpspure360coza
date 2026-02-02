@@ -17,6 +17,7 @@ import ClientDashboard from "./pages/ClientDashboard";
 import WorkerDashboard from "./pages/WorkerDashboard";
 import CompleteProfile from "./pages/CompleteProfile";
 import PendingApproval from "./pages/PendingApproval";
+import WorkWithUs from "./pages/WorkWithUs";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/work-with-us" element={<WorkWithUs />} />
             
             {/* Client Routes */}
             <Route 
