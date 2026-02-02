@@ -42,16 +42,49 @@ const Header = () => {
         </button>
 
         {/* Desktop Navigation */}
-        <nav className="hidden items-center gap-6 md:flex">
-          <a href="#services" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
-            Services
-          </a>
-          <a href="#about" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
-            About
-          </a>
-          <a href="#contact" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
-            Contact
-          </a>
+        <nav className="hidden items-center gap-1 md:flex">
+          <button
+            onClick={() => {
+              navigate("/");
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground rounded-md hover:bg-muted"
+          >
+            Home
+          </button>
+          <button
+            onClick={() => {
+              navigate("/");
+              setTimeout(() => document.getElementById("services")?.scrollIntoView({ behavior: "smooth" }), 100);
+            }}
+            className="px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground rounded-md hover:bg-muted"
+          >
+            Our Services
+          </button>
+          <button
+            onClick={() => {
+              navigate("/");
+              setTimeout(() => document.getElementById("services")?.scrollIntoView({ behavior: "smooth" }), 100);
+            }}
+            className="px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground rounded-md hover:bg-muted"
+          >
+            Book a Service
+          </button>
+          <button
+            onClick={() => navigate("/work-with-us")}
+            className="px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground rounded-md hover:bg-muted"
+          >
+            Work With PURE360
+          </button>
+          <button
+            onClick={() => {
+              navigate("/");
+              setTimeout(() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" }), 100);
+            }}
+            className="px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground rounded-md hover:bg-muted"
+          >
+            Contact Us
+          </button>
         </nav>
 
         {/* Actions */}
