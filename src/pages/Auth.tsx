@@ -11,7 +11,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { validatePassword } from "@/lib/passwordValidation";
 import PasswordStrengthMeter from "@/components/auth/PasswordStrengthMeter";
 import RoleSelector from "@/components/auth/RoleSelector";
-import AddressAutocomplete from "@/components/auth/AddressAutocomplete";
 import { lovable } from "@/integrations/lovable";
 import logo from "@/assets/logo.png";
 
@@ -25,9 +24,6 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [address, setAddress] = useState("");
-  const [latitude, setLatitude] = useState<number | null>(null);
-  const [longitude, setLongitude] = useState<number | null>(null);
   const [selectedRole, setSelectedRole] = useState<SelectedRole>("client");
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
@@ -70,11 +66,6 @@ const Auth = () => {
     }
   };
 
-  const handleAddressChange = (addr: string, lat: number | null, lng: number | null) => {
-    setAddress(addr);
-    setLatitude(lat);
-    setLongitude(lng);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,16 +112,6 @@ const Auth = () => {
           return;
         }
 
-        // For clients, require address
-        if (selectedRole === "client" && (!address || !latitude || !longitude)) {
-          toast({
-            title: "Invalid address",
-            description: "Please select a valid address from the dropdown.",
-            variant: "destructive",
-          });
-          setIsLoading(false);
-          return;
-        }
 
         // Sign up user
         const { error: signUpError } = await signUp(email, password);
@@ -176,9 +157,6 @@ const Auth = () => {
               user_id: newUser.id,
               first_name: firstName.trim(),
               last_name: lastName.trim(),
-              address,
-              latitude,
-              longitude,
               profile_completed: true,
             });
 
@@ -332,14 +310,6 @@ const Auth = () => {
                 {!isLogin && <PasswordStrengthMeter password={password} />}
               </div>
 
-              {/* Address - Only for client signup */}
-              {!isLogin && selectedRole === "client" && (
-                <AddressAutocomplete
-                  value={address}
-                  onChange={handleAddressChange}
-                  required
-                />
-              )}
 
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading 
