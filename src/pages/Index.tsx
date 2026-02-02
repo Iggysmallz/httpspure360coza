@@ -103,26 +103,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Enquiry Section */}
-      <section className="bg-muted/30 px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-xl">
-          <div className="mb-8 text-center">
-            <h2 className="mb-3 text-2xl font-bold text-foreground sm:text-3xl">
-              Book an Enquiry
-            </h2>
-            <p className="text-muted-foreground">
-              Tell us what you need, and our team will contact you to confirm your booking.
-            </p>
-          </div>
-          
-          <Card className="shadow-card">
-            <CardContent className="pt-6">
-              <EnquiryForm />
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
       {/* Why Choose Us Section */}
       <WhyChooseUs />
 
