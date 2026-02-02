@@ -1,46 +1,48 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { SprayCan, Sparkles, Home, TreeDeciduous, Truck, Trash2 } from "lucide-react";
+import { SprayCan, Sparkles, Home, TreeDeciduous, Truck, Trash2, Zap } from "lucide-react";
 import { LucideIcon } from "lucide-react";
+
+interface PricingItem {
+  label: string;
+  price: string;
+}
 
 interface PricingCardProps {
   title: string;
   icon: LucideIcon;
-  features: string[];
-  pricing: string;
+  pricingItems: PricingItem[];
   path: string;
 }
 
-const PricingCard = ({ title, icon: Icon, features, pricing, path }: PricingCardProps) => {
+const PricingCard = ({ title, icon: Icon, pricingItems, path }: PricingCardProps) => {
   const navigate = useNavigate();
 
   return (
     <Card className="flex flex-col h-full transition-all duration-300 hover:shadow-elevated hover:-translate-y-1">
-      <CardHeader className="pb-4">
-        <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
-          <Icon className="h-6 w-6 text-primary" />
+      <CardHeader className="pb-3">
+        <div className="mb-3 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
+          <Icon className="h-5 w-5 text-primary" />
         </div>
-        <CardTitle className="text-lg">{title}</CardTitle>
+        <CardTitle className="text-base font-semibold">{title}</CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-col flex-1">
-        <ul className="mb-4 space-y-2 flex-1">
-          {features.map((feature, index) => (
-            <li key={index} className="flex items-start gap-2 text-sm text-muted-foreground">
-              <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
-              {feature}
-            </li>
+      <CardContent className="flex flex-col flex-1 pt-0">
+        <div className="mb-4 space-y-2 flex-1">
+          {pricingItems.map((item, index) => (
+            <div key={index} className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">{item.label}</span>
+              <span className="font-medium text-foreground">{item.price}</span>
+            </div>
           ))}
-        </ul>
-        <div className="mb-4">
-          <p className="text-lg font-semibold text-foreground">{pricing}</p>
         </div>
         <Button 
           onClick={() => navigate(path)} 
           variant="outline" 
+          size="sm"
           className="w-full"
         >
-          Request a Quote
+          Request Quote
         </Button>
       </CardContent>
     </Card>
@@ -52,44 +54,64 @@ const PricingSection = () => {
     {
       title: "Home Cleaning",
       icon: SprayCan,
-      features: ["Once-off cleaning", "Weekly / Fortnightly options"],
-      pricing: "From R285",
+      pricingItems: [
+        { label: "Once-off", price: "From R230" },
+        { label: "Weekly", price: "From R210" },
+      ],
       path: "/cleaning?type=home",
     },
     {
       title: "Deep & Moving Cleaning",
       icon: Sparkles,
-      features: ["Move-in / Move-out", "Deep cleans"],
-      pricing: "From R235 depending on size",
+      pricingItems: [
+        { label: "Deep clean", price: "From R580" },
+        { label: "Move-in/out", price: "From R780" },
+      ],
       path: "/cleaning?type=deep",
     },
     {
       title: "Airbnb & Short-Stay",
       icon: Home,
-      features: ["Per turnover clean", "Optional linen & restocking support"],
-      pricing: "Per booking",
+      pricingItems: [
+        { label: "Per turnover", price: "From R180" },
+      ],
       path: "/cleaning?type=airbnb",
     },
     {
       title: "Outdoor & Garden",
       icon: TreeDeciduous,
-      features: ["Once-off or maintenance", "Gardening & outdoor cleaning"],
-      pricing: "Hourly or per job",
+      pricingItems: [
+        { label: "Per hour", price: "From R220" },
+      ],
       path: "/cleaning?type=outdoor",
     },
     {
       title: "Rubble & Furniture Removal",
       icon: Truck,
-      features: ["Small, medium and large loads", "Safe disposal included"],
-      pricing: "Quoted after assessment",
+      pricingItems: [
+        { label: "Small load", price: "From R440" },
+        { label: "Medium load", price: "From R780" },
+        { label: "Large load", price: "From R1,280" },
+      ],
       path: "/removals",
     },
     {
       title: "Bin Cleaning",
       icon: Trash2,
-      features: ["Monthly or once-off", "Eco-friendly deodorising"],
-      pricing: "Per bin",
+      pricingItems: [
+        { label: "Once-off", price: "R180/bin" },
+        { label: "Monthly", price: "R440" },
+      ],
       path: "/cleaning?type=bin",
+    },
+    {
+      title: "Express / Quick Tasks",
+      icon: Zap,
+      pricingItems: [
+        { label: "Weekdays", price: "From R180" },
+        { label: "Weekends", price: "From R260" },
+      ],
+      path: "/cleaning?type=express",
     },
   ];
 
@@ -97,18 +119,27 @@ const PricingSection = () => {
     <section className="px-4 py-12 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl">
         <div className="mb-8 text-center">
-          <h2 className="mb-3 text-2xl font-bold text-foreground sm:text-3xl">
-            Simple, transparent pricing.
+          <h2 className="mb-3 text-xl font-bold text-foreground sm:text-2xl lg:text-3xl">
+            Transparent Pricing — Always Cheaper Than the Competition
           </h2>
-          <p className="text-muted-foreground max-w-xl mx-auto">
-            Final pricing may vary based on size, scope and location. Our team will confirm via WhatsApp.
+          <p className="text-muted-foreground max-w-2xl mx-auto text-sm sm:text-base">
+            Prices start here — final cost is confirmed via WhatsApp before booking.
           </p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
           {pricingData.map((item) => (
             <PricingCard key={item.title} {...item} />
           ))}
+        </div>
+
+        <div className="mt-8 text-center space-y-1">
+          <p className="text-xs text-muted-foreground">
+            Final price confirmed before booking. Prices may vary by home size and location.
+          </p>
+          <p className="text-xs text-muted-foreground">
+            All services include vetted staff and quality guarantee.
+          </p>
         </div>
       </div>
     </section>
