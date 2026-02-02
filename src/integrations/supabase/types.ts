@@ -56,6 +56,45 @@ export type Database = {
         }
         Relationships: []
       }
+      enquiries: {
+        Row: {
+          additional_notes: string | null
+          area_suburb: string
+          contact_number: string
+          created_at: string
+          full_name: string
+          id: string
+          preferred_date: string | null
+          service_required: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          additional_notes?: string | null
+          area_suburb: string
+          contact_number: string
+          created_at?: string
+          full_name: string
+          id?: string
+          preferred_date?: string | null
+          service_required: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          additional_notes?: string | null
+          area_suburb?: string
+          contact_number?: string
+          created_at?: string
+          full_name?: string
+          id?: string
+          preferred_date?: string | null
+          service_required?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           address: string | null
