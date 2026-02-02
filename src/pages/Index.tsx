@@ -1,5 +1,13 @@
 import { useNavigate } from "react-router-dom";
-import { SprayCan, Truck, Heart } from "lucide-react";
+import { 
+  SprayCan, 
+  Sparkles, 
+  TreeDeciduous, 
+  Home, 
+  Truck, 
+  Heart, 
+  Trash2 
+} from "lucide-react";
 import Layout from "@/components/Layout";
 import Hero from "@/components/Hero";
 import ServiceCard from "@/components/ServiceCard";
@@ -11,22 +19,46 @@ const Index = () => {
 
   const services = [
     {
-      title: "Cleaning Services",
-      description: "13 cleaning options including home, office, commercial, window cleaning & more. R15 cheaper than competitors!",
+      title: "Home Cleaning",
+      description: "Reliable recurring or once-off home cleaning services.",
       icon: SprayCan,
-      path: "/cleaning",
+      path: "/cleaning?type=home",
     },
     {
-      title: "Removals",
-      description: "Reliable furniture moving and rubble removal. Get a custom quote for your specific needs.",
+      title: "Deep & Moving Cleaning",
+      description: "Move-in, move-out and deep cleaning solutions.",
+      icon: Sparkles,
+      path: "/cleaning?type=deep",
+    },
+    {
+      title: "Outdoor & Garden",
+      description: "Gardening, outdoor cleaning and maintenance.",
+      icon: TreeDeciduous,
+      path: "/cleaning?type=outdoor",
+    },
+    {
+      title: "Airbnb & Short-Stay",
+      description: "Professional turnover cleans for short-term rentals.",
+      icon: Home,
+      path: "/cleaning?type=airbnb",
+    },
+    {
+      title: "Rubble & Furniture Removal",
+      description: "Safe removal of rubble, old furniture and unwanted items.",
       icon: Truck,
       path: "/removals",
     },
     {
       title: "Care Services",
-      description: "Compassionate elderly companion care and professional nursing services for your loved ones.",
+      description: "Elderly care and in-home assistance, including nurse-supported services.",
       icon: Heart,
       path: "/care",
+    },
+    {
+      title: "Bin Cleaning",
+      description: "Hygienic, eco-friendly bin cleaning and deodorising services.",
+      icon: Trash2,
+      path: "/cleaning?type=bin",
     },
   ];
 
@@ -44,13 +76,13 @@ const Index = () => {
       
       {/* Services Section */}
       <section id="services" className="px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-4xl">
+        <div className="mx-auto max-w-5xl">
           <div className="mb-8 text-center">
             <h2 className="mb-3 text-2xl font-bold text-foreground sm:text-3xl">
               Our Services
             </h2>
             <p className="text-muted-foreground">
-              Choose a service to get started
+              Professional solutions for every home and property need
             </p>
           </div>
           
