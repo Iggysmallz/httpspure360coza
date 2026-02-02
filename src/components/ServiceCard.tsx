@@ -1,4 +1,4 @@
-import { LucideIcon } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ServiceCardProps {
@@ -7,9 +7,10 @@ interface ServiceCardProps {
   icon: LucideIcon;
   onClick: () => void;
   className?: string;
+  urgencyText?: string;
 }
 
-const ServiceCard = ({ title, description, icon: Icon, onClick, className }: ServiceCardProps) => {
+const ServiceCard = ({ title, description, icon: Icon, onClick, className, urgencyText }: ServiceCardProps) => {
   return (
     <button
       onClick={onClick}
@@ -37,6 +38,11 @@ const ServiceCard = ({ title, description, icon: Icon, onClick, className }: Ser
         <p className="text-sm text-muted-foreground leading-relaxed">
           {description}
         </p>
+        {urgencyText && (
+          <p className="mt-2 text-xs text-primary/80 italic">
+            {urgencyText}
+          </p>
+        )}
       </div>
       
       {/* Arrow indicator */}
