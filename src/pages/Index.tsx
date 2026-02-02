@@ -12,6 +12,7 @@ import Layout from "@/components/Layout";
 import Hero from "@/components/Hero";
 import ServiceCard from "@/components/ServiceCard";
 import EnquiryForm from "@/components/EnquiryForm";
+import WhyChooseUs from "@/components/WhyChooseUs";
 import ContactSection from "@/components/ContactSection";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { Card, CardContent } from "@/components/ui/card";
@@ -121,6 +122,9 @@ const Index = () => {
           </Card>
         </div>
       </section>
+
+      {/* Why Choose Us Section */}
+      <WhyChooseUs />
 
       {/* Trust Section */}
       <section className="bg-muted/30 px-4 py-12 sm:px-6 lg:px-8">
