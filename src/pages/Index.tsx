@@ -11,11 +11,12 @@ import {
 import Layout from "@/components/Layout";
 import Hero from "@/components/Hero";
 import ServiceCard from "@/components/ServiceCard";
-import EnquiryForm from "@/components/EnquiryForm";
 import WhyChooseUs from "@/components/WhyChooseUs";
 import ContactSection from "@/components/ContactSection";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import PricingSection from "@/components/PricingSection";
+import UrgencyBanner from "@/components/UrgencyBanner";
+import ServiceBundles from "@/components/ServiceBundles";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -26,42 +27,49 @@ const Index = () => {
       description: "Reliable recurring or once-off home cleaning services.",
       icon: SprayCan,
       path: "/cleaning?type=home",
+      urgencyText: "Popular service — early booking recommended",
     },
     {
       title: "Deep & Moving Cleaning",
       description: "Move-in, move-out and deep cleaning solutions.",
       icon: Sparkles,
       path: "/cleaning?type=deep",
+      urgencyText: "High demand in selected areas",
     },
     {
       title: "Outdoor & Garden",
       description: "Gardening, outdoor cleaning and maintenance.",
       icon: TreeDeciduous,
       path: "/cleaning?type=outdoor",
+      urgencyText: "Limited availability during month-end",
     },
     {
       title: "Airbnb & Short-Stay",
       description: "Professional turnover cleans for short-term rentals.",
       icon: Home,
       path: "/cleaning?type=airbnb",
+      urgencyText: "Popular with Cape Town hosts",
     },
     {
       title: "Rubble & Furniture Removal",
       description: "Safe removal of rubble, old furniture and unwanted items.",
       icon: Truck,
       path: "/removals",
+      urgencyText: "High demand in selected areas",
     },
     {
       title: "Care Services",
       description: "Elderly care and in-home assistance, including nurse-supported services.",
       icon: Heart,
       path: "/care",
+      urgencyText: "Limited availability — book ahead",
     },
     {
       title: "Bin Cleaning",
       description: "Hygienic, eco-friendly bin cleaning and deodorising services.",
       icon: Trash2,
       path: "/cleaning?type=bin",
+      urgencyText: "Popular service — early booking recommended",
     },
   ];
 
@@ -75,6 +83,7 @@ const Index = () => {
 
   return (
     <Layout>
+      <UrgencyBanner />
       <Hero onBookService={scrollToServices} onWorkWithUs={handleWorkWithUs} />
       
       {/* Services Section */}
@@ -97,6 +106,7 @@ const Index = () => {
                 description={service.description}
                 icon={service.icon}
                 onClick={() => navigate(service.path)}
+                urgencyText={service.urgencyText}
               />
             ))}
           </div>
@@ -105,6 +115,9 @@ const Index = () => {
 
       {/* Pricing Section */}
       <PricingSection />
+
+      {/* Service Bundles Section */}
+      <ServiceBundles />
 
       {/* Why Choose Us Section */}
       <WhyChooseUs />
