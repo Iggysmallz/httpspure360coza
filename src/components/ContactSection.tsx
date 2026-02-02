@@ -69,39 +69,6 @@ const ContactSection = () => {
           </div>
         </div>
 
-        {/* WhatsApp Quick Actions */}
-        <div className="mt-8 rounded-xl bg-gradient-to-r from-green-500/10 to-green-600/10 p-6 border border-green-500/20">
-          <h3 className="mb-4 text-center font-semibold text-foreground">
-            Quick WhatsApp Actions
-          </h3>
-          <div className="flex flex-wrap justify-center gap-3">
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-green-500 text-green-600 hover:bg-green-50"
-              onClick={() => handleWhatsAppClick("Hi Pure360, I'd like to book a cleaning service.")}
-            >
-              📅 Book Cleaning
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-green-500 text-green-600 hover:bg-green-50"
-              onClick={() => handleWhatsAppClick("Hi Pure360, I need a quote for removals.")}
-            >
-              🚚 Removals Enquiry
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-green-500 text-green-600 hover:bg-green-50"
-              onClick={() => handleWhatsAppClick("Hi Pure360, I'm enquiring about care services.")}
-            >
-              💙 Care Services
-            </Button>
-          </div>
-        </div>
-
         {/* Social Media */}
         <div className="mt-8 text-center">
           <h3 className="mb-4 font-semibold text-foreground">Follow Us</h3>
