@@ -1,11 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Shield, Clock, Star } from "lucide-react";
+import { ArrowRight, Shield, Clock, Star, Briefcase } from "lucide-react";
 
 interface HeroProps {
-  onGetStarted: () => void;
+  onBookService: () => void;
+  onWorkWithUs: () => void;
 }
 
-const Hero = ({ onGetStarted }: HeroProps) => {
+const Hero = ({ onBookService, onWorkWithUs }: HeroProps) => {
   const features = [
     { icon: Shield, text: "Trusted & Vetted" },
     { icon: Clock, text: "Same Day Service" },
@@ -29,9 +30,9 @@ const Hero = ({ onGetStarted }: HeroProps) => {
 
         {/* Main heading */}
         <h1 className="mb-6 text-center text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl animate-fade-in" style={{ animationDelay: "0.1s" }}>
-          Professional{" "}
+          All your home & property services.{" "}
           <span className="relative">
-            <span className="text-primary">Home & Care</span>
+            <span className="text-primary">One trusted team.</span>
             <svg
               className="absolute -bottom-2 left-0 w-full"
               viewBox="0 0 200 12"
@@ -46,25 +47,32 @@ const Hero = ({ onGetStarted }: HeroProps) => {
                 opacity="0.3"
               />
             </svg>
-          </span>{" "}
-          Services
+          </span>
         </h1>
 
         {/* Subtitle */}
         <p className="mx-auto mb-8 max-w-2xl text-center text-lg text-muted-foreground sm:text-xl animate-fade-in" style={{ animationDelay: "0.2s" }}>
-          From spotless homes to compassionate care, we bring excellence to every service. 
-          Book cleaning, removals, or care services in just a few taps.
+          From home cleaning and gardening to removals, Airbnb turnovers and care services — PURE360 manages it all, professionally and reliably.
         </p>
 
-        {/* CTA Button */}
-        <div className="mb-10 flex justify-center animate-fade-in" style={{ animationDelay: "0.3s" }}>
+        {/* CTA Buttons */}
+        <div className="mb-10 flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in" style={{ animationDelay: "0.3s" }}>
           <Button 
-            onClick={onGetStarted}
+            onClick={onBookService}
             size="lg" 
-            className="group h-14 gap-3 rounded-xl px-8 text-base font-semibold shadow-lg shadow-primary/25 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30"
+            className="group h-14 w-full sm:w-auto gap-3 rounded-xl px-8 text-base font-semibold shadow-lg shadow-primary/25 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30"
           >
-            Get Started
+            Book a Service
             <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+          </Button>
+          <Button 
+            onClick={onWorkWithUs}
+            variant="outline"
+            size="lg" 
+            className="group h-14 w-full sm:w-auto gap-3 rounded-xl px-8 text-base font-semibold border-2 transition-all duration-300 hover:bg-secondary"
+          >
+            <Briefcase className="h-5 w-5" />
+            Work With PURE360
           </Button>
         </div>
 
