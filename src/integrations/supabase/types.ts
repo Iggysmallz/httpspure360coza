@@ -233,6 +233,45 @@ export type Database = {
         }
         Relationships: []
       }
+      worker_applications: {
+        Row: {
+          additional_notes: string | null
+          area: string
+          contact_number: string
+          created_at: string
+          full_name: string
+          id: string
+          status: string
+          updated_at: string
+          work_type: string
+          years_experience: string | null
+        }
+        Insert: {
+          additional_notes?: string | null
+          area: string
+          contact_number: string
+          created_at?: string
+          full_name: string
+          id?: string
+          status?: string
+          updated_at?: string
+          work_type: string
+          years_experience?: string | null
+        }
+        Update: {
+          additional_notes?: string | null
+          area?: string
+          contact_number?: string
+          created_at?: string
+          full_name?: string
+          id?: string
+          status?: string
+          updated_at?: string
+          work_type?: string
+          years_experience?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
