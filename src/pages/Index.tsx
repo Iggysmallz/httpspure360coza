@@ -126,6 +126,20 @@ const Index = () => {
       {/* Why Choose Us Section */}
       <WhyChooseUs />
 
+      {/* Positioning Section */}
+      <section className="px-4 py-12 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-3xl text-center">
+          <h2 className="mb-4 text-2xl font-bold text-foreground sm:text-3xl">
+            More than a booking platform.
+          </h2>
+          <p className="text-lg leading-relaxed text-muted-foreground">
+            PURE360 doesn't just connect you to workers — we manage the service. 
+            Our team handles coordination, quality checks and customer support so 
+            you can enjoy peace of mind.
+          </p>
+        </div>
+      </section>
+
       {/* Trust Section */}
       <section className="bg-muted/30 px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
