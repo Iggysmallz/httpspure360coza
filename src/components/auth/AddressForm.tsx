@@ -14,6 +14,7 @@ import {
 import { Search, MapPin, Building2, Home, ChevronDown, ChevronUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { mapGoogleAddressToSA } from "@/utils/addressMapper";
 
 // South African provinces
 const SA_PROVINCES = [
@@ -143,42 +144,19 @@ const AddressForm = ({ initialData, onChange, required = false }: AddressFormPro
     const place = autocompleteRef.current?.getPlace();
     if (!place?.address_components || !place.geometry?.location) return;
 
-    // Extract address components
-    let streetNumber = "";
-    let route = "";
-    let sublocality = "";
-    let locality = "";
-    let adminArea1 = "";
-    let postalCodeValue = "";
-
-    for (const component of place.address_components) {
-      const types = component.types;
-      if (types.includes("street_number")) {
-        streetNumber = component.long_name;
-      } else if (types.includes("route")) {
-        route = component.long_name;
-      } else if (types.includes("sublocality") || types.includes("sublocality_level_1")) {
-        sublocality = component.long_name;
-      } else if (types.includes("locality")) {
-        locality = component.long_name;
-      } else if (types.includes("administrative_area_level_1")) {
-        adminArea1 = component.long_name;
-      } else if (types.includes("postal_code")) {
-        postalCodeValue = component.long_name;
-      }
-    }
+    const addressData = mapGoogleAddressToSA(place);
 
     // Update state
-    setStreetAddress(`${streetNumber} ${route}`.trim());
-    setSuburb(sublocality || locality);
-    setCity(locality);
-    setProvince(adminArea1);
-    setPostalCode(postalCodeValue);
-    setLatitude(place.geometry.location.lat());
-    setLongitude(place.geometry.location.lng());
+    setStreetAddress(`${addressData.streetNumber} ${addressData.streetName}`.trim());
+    setSuburb(addressData.suburb || addressData.city);
+    setCity(addressData.city);
+    setProvince(addressData.province);
+    setPostalCode(addressData.postalCode);
+    setLatitude(addressData.latitude);
+    setLongitude(addressData.longitude);
     setHasSelectedAddress(true);
     setShowDetails(true);
-    setSearchValue(place.formatted_address || "");
+    setSearchValue(addressData.fullAddress);
 
     // Focus unit number field for quick entry
     setTimeout(() => unitInputRef.current?.focus(), 100);
