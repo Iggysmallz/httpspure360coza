@@ -15,7 +15,7 @@ import EnquiryForm from "@/components/EnquiryForm";
 import WhyChooseUs from "@/components/WhyChooseUs";
 import ContactSection from "@/components/ContactSection";
 import WhatsAppButton from "@/components/WhatsAppButton";
-import { Card, CardContent } from "@/components/ui/card";
+import PricingSection from "@/components/PricingSection";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -102,6 +102,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Pricing Section */}
+      <PricingSection />
 
       {/* Why Choose Us Section */}
       <WhyChooseUs />
