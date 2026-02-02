@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -16,18 +15,7 @@ import { Search, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { mapGoogleAddressToSA } from "@/utils/addressMapper";
-
-const PROVINCES = [
-  "Eastern Cape",
-  "Free State",
-  "Gauteng",
-  "KwaZulu-Natal",
-  "Limpopo",
-  "Mpumalanga",
-  "Northern Cape",
-  "North West",
-  "Western Cape",
-] as const;
+import { addressSchema, SA_PROVINCES, type AddressValues } from "@/utils/addressSchema";
 
 export interface AddressData {
   unitNumber: string;
@@ -112,18 +100,20 @@ const AddressForm = ({ initialData, onChange, required = false }: AddressFormPro
     return parts.join(", ");
   }, [address]);
 
-  // Validate form
+  // Validate form using Zod schema
   const validateForm = useCallback(() => {
     if (!required) return true;
-
-    const hasStreet = address.street.trim().length > 0;
-    const hasSuburb = address.suburb.trim().length > 0;
-    const hasCity = address.city.trim().length > 0;
-    const hasProvince = address.province.trim().length > 0;
-    const validPostal = /^\d{4}$/.test(address.postalCode);
-
-    return hasStreet && hasSuburb && hasCity && hasProvince && validPostal;
+    const result = addressSchema.safeParse(address);
+    return result.success;
   }, [required, address]);
+
+  // Get validation errors for display
+  const getFieldError = useCallback((field: keyof AddressValues): string | undefined => {
+    const result = addressSchema.safeParse(address);
+    if (result.success) return undefined;
+    const fieldError = result.error.errors.find((e) => e.path[0] === field);
+    return fieldError?.message;
+  }, [address]);
 
   // Notify parent of changes
   useEffect(() => {
@@ -387,7 +377,7 @@ const AddressForm = ({ initialData, onChange, required = false }: AddressFormPro
                   <SelectValue placeholder="Select province" />
                 </SelectTrigger>
                 <SelectContent className="bg-background border z-50">
-                  {PROVINCES.map((p) => (
+                  {SA_PROVINCES.map((p) => (
                     <SelectItem key={p} value={p}>
                       {p}
                     </SelectItem>
