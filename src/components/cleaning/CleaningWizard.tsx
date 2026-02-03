@@ -16,6 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import CheckoutSummary from "./CheckoutSummary";
+import BookingConfirmation from "./BookingConfirmation";
 import { useProfile } from "@/hooks/useProfile";
 
 interface ServiceType {
@@ -97,6 +98,7 @@ const CleaningWizard = () => {
   const [date, setDate] = useState<Date | undefined>();
   const [time, setTime] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [bookingComplete, setBookingComplete] = useState(false);
   
   // Quote form fields
   const [specialRequirements, setSpecialRequirements] = useState<string>("");
@@ -122,6 +124,9 @@ const CleaningWizard = () => {
     );
   };
 
+  const travelFee = 50;
+  const finalTotalPrice = totalPrice + travelFee;
+
   const handleBookingSubmit = async () => {
     if (!user) {
       toast({
@@ -144,17 +149,13 @@ const CleaningWizard = () => {
         bathrooms,
         scheduled_date: format(date, "yyyy-MM-dd"),
         scheduled_time: time,
-        total_price: totalPrice,
+        total_price: finalTotalPrice,
         status: "pending",
       });
 
       if (error) throw error;
 
-      toast({
-        title: "Booking confirmed!",
-        description: `Your ${selectedService?.name} has been scheduled for ${format(date, "PPP")} at ${time}.`,
-      });
-      navigate("/bookings");
+      setBookingComplete(true);
     } catch (error) {
       console.error("Booking error:", error);
       toast({
@@ -678,6 +679,27 @@ const CleaningWizard = () => {
     }
     return currentStep === 5 && date && time;
   };
+
+  // Show confirmation page after successful booking
+  if (bookingComplete) {
+    const addressParts = [
+      profile?.unit_number,
+      profile?.street_address,
+      profile?.suburb,
+    ].filter(Boolean);
+
+    return (
+      <BookingConfirmation
+        bookingDetails={{
+          serviceName: selectedService?.name || "",
+          date: date ? format(date, "PPP") : "",
+          time,
+          totalPrice: finalTotalPrice,
+          address: addressParts.length > 0 ? addressParts.join(", ") : undefined,
+        }}
+      />
+    );
+  }
 
   // Show checkout step alone for cleaner UI
   if (currentStep === 5 && !isQuoteBased) {
