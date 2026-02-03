@@ -15,6 +15,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
+import CheckoutSummary from "./CheckoutSummary";
+import { useProfile } from "@/hooks/useProfile";
 
 interface ServiceType {
   id: string;
@@ -101,6 +103,7 @@ const CleaningWizard = () => {
 
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { profile } = useProfile();
 
   const selectedService = SERVICE_TYPES.find(s => s.id === serviceType);
   const isQuoteBased = selectedService?.isQuoteBased ?? false;
@@ -206,7 +209,7 @@ const CleaningWizard = () => {
   const instantBookServices = SERVICE_TYPES.filter(s => !s.isQuoteBased);
   const quoteServices = SERVICE_TYPES.filter(s => s.isQuoteBased);
 
-  // For instant book: Step 1 = Service, Step 2 = Home Size, Step 3 = Add-ons, Step 4 = Date/Time
+  // For instant book: Step 1 = Service, Step 2 = Home Size, Step 3 = Add-ons, Step 4 = Date/Time, Step 5 = Checkout
   // For quote: Step 1 = Service, Step 2 = Quote Form
 
   const renderServiceSection = () => (
@@ -504,10 +507,26 @@ const CleaningWizard = () => {
     return (
       <div className={cn(
         "rounded-xl border p-4 transition-all",
-        currentStep < 4 ? "border-muted bg-muted/30 opacity-50" : "border-border bg-card shadow-sm"
+        currentStep < 4 ? "border-muted bg-muted/30 opacity-50" : 
+        currentStep > 4 ? "border-muted bg-muted/30" : "border-border bg-card shadow-sm"
       )}>
-        <div className="flex items-center gap-2">
-          <h3 className="font-semibold text-foreground">4. Pick Date & Time</h3>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {currentStep > 4 && (
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                <Check className="h-3.5 w-3.5" />
+              </div>
+            )}
+            <h3 className="font-semibold text-foreground">4. Pick Date & Time</h3>
+          </div>
+          {currentStep > 4 && (
+            <button 
+              onClick={() => setCurrentStep(4)} 
+              className="flex items-center gap-1 text-sm text-primary hover:underline"
+            >
+              <Edit2 className="h-3.5 w-3.5" /> Edit
+            </button>
+          )}
         </div>
         
         {currentStep === 4 ? (
@@ -559,9 +578,51 @@ const CleaningWizard = () => {
                 </SelectContent>
               </Select>
             </div>
+
+            <Button 
+              onClick={() => setCurrentStep(5)} 
+              disabled={!date || !time}
+              className="w-full"
+            >
+              Next: Review & Pay
+              <ChevronRight className="ml-1 h-4 w-4" />
+            </Button>
           </div>
+        ) : currentStep > 4 ? (
+          <p className="mt-1 text-sm text-muted-foreground">
+            {date && format(date, "PPP")} at {time}
+          </p>
         ) : null}
       </div>
+    );
+  };
+
+  const renderCheckoutSection = () => {
+    if (isQuoteBased || currentStep !== 5) return null;
+
+    const selectedExtras = selectedAddOns.map(id => {
+      const addon = ADD_ONS.find(a => a.id === id);
+      return addon ? { id: addon.id, label: addon.label, price: addon.price } : null;
+    }).filter(Boolean) as { id: string; label: string; price: number }[];
+
+    const bookingData = {
+      serviceName: selectedService?.name || "",
+      basePrice,
+      extrasPrice: addOnsTotal,
+      selectedExtras,
+      unit: profile?.unit_number || "",
+      street: profile?.street_address || "",
+      suburb: profile?.suburb || "",
+      date: date ? format(date, "PPP") : "",
+      time,
+    };
+
+    return (
+      <CheckoutSummary 
+        bookingData={bookingData}
+        onPay={handleBookingSubmit}
+        isLoading={isSubmitting}
+      />
     );
   };
 
@@ -615,8 +676,13 @@ const CleaningWizard = () => {
     if (isQuoteBased) {
       return currentStep === 2;
     }
-    return currentStep === 4 && date && time;
+    return currentStep === 5 && date && time;
   };
+
+  // Show checkout step alone for cleaner UI
+  if (currentStep === 5 && !isQuoteBased) {
+    return renderCheckoutSection();
+  }
 
   return (
     <div className="space-y-4 pb-28">
@@ -626,8 +692,8 @@ const CleaningWizard = () => {
       {renderDateTimeSection()}
       {renderQuoteSection()}
 
-      {/* Sticky Price Footer */}
-      {serviceType && !isQuoteBased && currentStep > 1 && (
+      {/* Sticky Price Footer - hide on checkout step */}
+      {serviceType && !isQuoteBased && currentStep > 1 && currentStep < 5 && (
         <div className="fixed bottom-16 left-0 right-0 z-40 border-t border-border bg-card p-4 shadow-lg md:bottom-0">
           <div className="mx-auto flex max-w-lg items-center justify-between">
             <div>
@@ -639,14 +705,6 @@ const CleaningWizard = () => {
                 </p>
               )}
             </div>
-            <Button 
-              size="lg" 
-              disabled={!canSubmit() || isSubmitting}
-              onClick={handleBookingSubmit}
-              className="bg-green-600 px-8 hover:bg-green-700"
-            >
-              {isSubmitting ? "Booking..." : "Book Now"}
-            </Button>
           </div>
         </div>
       )}
