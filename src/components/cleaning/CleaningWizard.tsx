@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { 
-  CalendarIcon, Sparkles, Home, Clock, Check, ArrowLeft, ArrowRight,
+  CalendarIcon, Sparkles, Home, Clock, Check, Edit2, ChevronRight,
   Truck, Leaf, Building2, Shirt, Zap, CalendarCheck, Droplets, 
   Factory, Store, Flower2, Key, LucideIcon
 } from "lucide-react";
@@ -23,6 +23,13 @@ interface ServiceType {
   icon: LucideIcon;
   isQuoteBased: boolean;
   priceInfo?: string;
+}
+
+interface AddOn {
+  id: string;
+  label: string;
+  price: number;
+  icon: string;
 }
 
 const SERVICE_TYPES: ServiceType[] = [
@@ -42,6 +49,15 @@ const SERVICE_TYPES: ServiceType[] = [
   { id: "outdoor_services", name: "Outdoor Services", description: "Garden maintenance and dog walking", icon: Leaf, isQuoteBased: true },
   { id: "gardening", name: "Gardening Services", description: "Landscaping and irrigation", icon: Flower2, isQuoteBased: true },
   { id: "laundry_ironing", name: "Laundry & Ironing", description: "Professional laundry services", icon: Shirt, isQuoteBased: true },
+];
+
+const ADD_ONS: AddOn[] = [
+  { id: "ironing", label: "Ironing", price: 60, icon: "👕" },
+  { id: "oven", label: "Oven Clean", price: 75, icon: "🔥" },
+  { id: "windows_addon", label: "Windows", price: 50, icon: "🪟" },
+  { id: "fridge", label: "Fridge", price: 65, icon: "❄️" },
+  { id: "laundry", label: "Laundry", price: 55, icon: "🧺" },
+  { id: "cabinets", label: "Cabinets", price: 45, icon: "🗄️" },
 ];
 
 const TIME_SLOTS = [
@@ -71,10 +87,11 @@ const calculatePrice = (bedrooms: number, bathrooms: number, serviceType: string
 };
 
 const CleaningWizard = () => {
-  const [step, setStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(1);
   const [serviceType, setServiceType] = useState<string>("");
   const [bedrooms, setBedrooms] = useState<number>(2);
   const [bathrooms, setBathrooms] = useState<number>(1);
+  const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
   const [date, setDate] = useState<Date | undefined>();
   const [time, setTime] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -88,23 +105,18 @@ const CleaningWizard = () => {
   const selectedService = SERVICE_TYPES.find(s => s.id === serviceType);
   const isQuoteBased = selectedService?.isQuoteBased ?? false;
   
-  const totalPrice = calculatePrice(bedrooms, bathrooms, serviceType);
+  const basePrice = calculatePrice(bedrooms, bathrooms, serviceType);
+  const addOnsTotal = selectedAddOns.reduce((acc, id) => {
+    const addon = ADD_ONS.find(a => a.id === id);
+    return acc + (addon?.price || 0);
+  }, 0);
+  const totalPrice = basePrice + addOnsTotal;
   const estimatedHours = calculateHours(bedrooms, bathrooms);
 
-  // Determine total steps based on service type
-  const totalSteps = isQuoteBased ? 2 : 3;
-
-  const canProceed = () => {
-    if (step === 1) return !!serviceType;
-    if (isQuoteBased) {
-      // Quote-based: step 2 is the quote form
-      return true; // Can always submit a quote
-    } else {
-      // Instant book: step 2 is rooms, step 3 is date/time
-      if (step === 2) return bedrooms > 0 && bathrooms > 0;
-      if (step === 3) return !!date && !!time;
-    }
-    return false;
+  const toggleAddOn = (id: string) => {
+    setSelectedAddOns(prev => 
+      prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]
+    );
   };
 
   const handleBookingSubmit = async () => {
@@ -191,82 +203,67 @@ const CleaningWizard = () => {
     }
   };
 
-  const handleNext = () => {
-    if (step === 1 && isQuoteBased) {
-      setStep(2); // Go to quote form
-    } else {
-      setStep(step + 1);
-    }
-  };
-
-  const handleSubmit = () => {
-    if (isQuoteBased) {
-      handleQuoteSubmit();
-    } else {
-      handleBookingSubmit();
-    }
-  };
-
   const instantBookServices = SERVICE_TYPES.filter(s => !s.isQuoteBased);
   const quoteServices = SERVICE_TYPES.filter(s => s.isQuoteBased);
 
-  return (
-    <div className="space-y-6">
-      {/* Progress Steps */}
-      <div className="flex items-center justify-center gap-2">
-        {Array.from({ length: totalSteps }, (_, i) => i + 1).map((s) => (
-          <div
-            key={s}
-            className={cn(
-              "flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium transition-colors",
-              s === step
-                ? "bg-primary text-primary-foreground"
-                : s < step
-                ? "bg-primary/20 text-primary"
-                : "bg-muted text-muted-foreground"
-            )}
-          >
-            {s < step ? <Check className="h-4 w-4" /> : s}
-          </div>
-        ))}
-      </div>
+  // For instant book: Step 1 = Service, Step 2 = Home Size, Step 3 = Add-ons, Step 4 = Date/Time
+  // For quote: Step 1 = Service, Step 2 = Quote Form
 
-      {/* Step 1: Service Type */}
-      {step === 1 && (
-        <div className="space-y-4">
-          <h2 className="text-center text-xl font-semibold text-foreground">
-            Choose Your Service
-          </h2>
-          
+  const renderServiceSection = () => (
+    <div className={cn(
+      "rounded-xl border p-4 transition-all",
+      currentStep > 1 ? "border-muted bg-muted/30" : "border-border bg-card shadow-sm"
+    )}>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          {currentStep > 1 && serviceType && (
+            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground">
+              <Check className="h-3.5 w-3.5" />
+            </div>
+          )}
+          <h3 className="font-semibold text-foreground">1. Choose Service</h3>
+        </div>
+        {currentStep > 1 && (
+          <button 
+            onClick={() => setCurrentStep(1)} 
+            className="flex items-center gap-1 text-sm text-primary hover:underline"
+          >
+            <Edit2 className="h-3.5 w-3.5" /> Edit
+          </button>
+        )}
+      </div>
+      
+      {currentStep === 1 ? (
+        <div className="mt-4 space-y-4 animate-in fade-in duration-300">
           {/* Instant Book Services */}
           <div className="space-y-2">
-            <p className="text-sm font-medium text-muted-foreground">Instant Booking</p>
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Instant Booking</p>
             <div className="grid gap-2">
               {instantBookServices.map((service) => (
                 <button
                   key={service.id}
                   onClick={() => setServiceType(service.id)}
                   className={cn(
-                    "flex items-center gap-3 rounded-xl border-2 p-3 text-left transition-all",
+                    "flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-all",
                     serviceType === service.id
                       ? "border-primary bg-primary/5"
                       : "border-border hover:border-primary/50"
                   )}
                 >
                   <div className={cn(
-                    "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg",
+                    "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
                     serviceType === service.id 
                       ? "bg-primary text-primary-foreground" 
                       : "bg-primary/10 text-primary"
                   )}>
-                    <service.icon className="h-5 w-5" />
+                    <service.icon className="h-4 w-4" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium text-foreground">{service.name}</p>
-                    <p className="truncate text-sm text-muted-foreground">{service.description}</p>
+                    <p className="text-sm font-medium text-foreground">{service.name}</p>
+                    <p className="truncate text-xs text-muted-foreground">{service.description}</p>
                   </div>
                   {service.priceInfo && (
-                    <span className="shrink-0 text-sm font-medium text-primary">{service.priceInfo}</span>
+                    <span className="shrink-0 text-xs font-medium text-primary">{service.priceInfo}</span>
                   )}
                 </button>
               ))}
@@ -275,149 +272,246 @@ const CleaningWizard = () => {
 
           {/* Quote-Based Services */}
           <div className="space-y-2">
-            <p className="text-sm font-medium text-muted-foreground">Request a Quote</p>
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Request a Quote</p>
             <div className="grid gap-2">
               {quoteServices.map((service) => (
                 <button
                   key={service.id}
                   onClick={() => setServiceType(service.id)}
                   className={cn(
-                    "flex items-center gap-3 rounded-xl border-2 p-3 text-left transition-all",
+                    "flex items-center gap-3 rounded-lg border-2 p-3 text-left transition-all",
                     serviceType === service.id
                       ? "border-primary bg-primary/5"
                       : "border-border hover:border-primary/50"
                   )}
                 >
                   <div className={cn(
-                    "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg",
+                    "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
                     serviceType === service.id 
-                      ? "bg-[hsl(var(--quote-service))] text-white" 
-                      : "bg-[hsl(var(--quote-service-light))] text-[hsl(var(--quote-service-foreground))]"
+                      ? "bg-amber-600 text-white" 
+                      : "bg-amber-100 text-amber-700"
                   )}>
-                    <service.icon className="h-5 w-5" />
+                    <service.icon className="h-4 w-4" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium text-foreground">{service.name}</p>
-                    <p className="truncate text-sm text-muted-foreground">{service.description}</p>
+                    <p className="text-sm font-medium text-foreground">{service.name}</p>
+                    <p className="truncate text-xs text-muted-foreground">{service.description}</p>
                   </div>
-                  <span className="shrink-0 rounded-full bg-muted px-2 py-1 text-xs text-muted-foreground">Quote</span>
+                  <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-700">Quote</span>
                 </button>
               ))}
             </div>
           </div>
-        </div>
-      )}
 
-      {/* Step 2 for Quote-Based: Quote Request Form */}
-      {step === 2 && isQuoteBased && (
-        <div className="space-y-6">
-          <h2 className="text-center text-xl font-semibold text-foreground">
-            Request a Quote
-          </h2>
-          
-          <div className="rounded-xl bg-muted/50 p-4">
-            <div className="flex items-center gap-3">
-              {selectedService && <selectedService.icon className="h-6 w-6 text-primary" />}
-              <div>
-                <p className="font-medium text-foreground">{selectedService?.name}</p>
-                <p className="text-sm text-muted-foreground">{selectedService?.description}</p>
+          <Button 
+            onClick={() => setCurrentStep(2)} 
+            disabled={!serviceType}
+            className="w-full"
+          >
+            Next: {isQuoteBased ? "Request Quote" : "Home Size"}
+            <ChevronRight className="ml-1 h-4 w-4" />
+          </Button>
+        </div>
+      ) : (
+        <p className="mt-1 text-sm text-muted-foreground">
+          {selectedService?.name}
+        </p>
+      )}
+    </div>
+  );
+
+  const renderHomeSizeSection = () => {
+    if (isQuoteBased) return null;
+
+    return (
+      <div className={cn(
+        "rounded-xl border p-4 transition-all",
+        currentStep < 2 ? "border-muted bg-muted/30 opacity-50" : 
+        currentStep > 2 ? "border-muted bg-muted/30" : "border-border bg-card shadow-sm"
+      )}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {currentStep > 2 && (
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                <Check className="h-3.5 w-3.5" />
+              </div>
+            )}
+            <h3 className="font-semibold text-foreground">2. Home Size</h3>
+          </div>
+          {currentStep > 2 && (
+            <button 
+              onClick={() => setCurrentStep(2)} 
+              className="flex items-center gap-1 text-sm text-primary hover:underline"
+            >
+              <Edit2 className="h-3.5 w-3.5" /> Edit
+            </button>
+          )}
+        </div>
+        
+        {currentStep === 2 ? (
+          <div className="mt-4 space-y-4 animate-in fade-in duration-300">
+            {/* Bedrooms */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Bedrooms</label>
+              <div className="flex items-center gap-2">
+                {[1, 2, 3, 4, 5].map(num => (
+                  <button
+                    key={num}
+                    onClick={() => setBedrooms(num)}
+                    className={cn(
+                      "flex h-12 w-12 items-center justify-center rounded-lg border-2 text-lg font-semibold transition-all",
+                      bedrooms === num
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border bg-background hover:border-primary/50"
+                    )}
+                  >
+                    {num}
+                  </button>
+                ))}
+                <button
+                  onClick={() => setBedrooms(6)}
+                  className={cn(
+                    "flex h-12 items-center justify-center rounded-lg border-2 px-3 text-sm font-medium transition-all",
+                    bedrooms >= 6
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border bg-background hover:border-primary/50"
+                  )}
+                >
+                  6+
+                </button>
               </div>
             </div>
-          </div>
 
-          <div className="space-y-4">
-            <div>
-              <label className="mb-2 block text-sm font-medium text-foreground">
-                Tell us about your requirements (optional)
-              </label>
-              <Textarea
-                value={specialRequirements}
-                onChange={(e) => setSpecialRequirements(e.target.value)}
-                placeholder="E.g., Size of space, frequency needed, specific requirements..."
-                rows={4}
-              />
-            </div>
-          </div>
-
-          <div className="rounded-xl bg-primary/10 p-4 text-center">
-            <p className="text-sm text-muted-foreground">We'll respond within</p>
-            <p className="text-lg font-semibold text-primary">2 hours</p>
-          </div>
-        </div>
-      )}
-
-      {/* Step 2 for Instant Book: Rooms */}
-      {step === 2 && !isQuoteBased && (
-        <div className="space-y-6">
-          <h2 className="text-center text-xl font-semibold text-foreground">
-            How Many Rooms?
-          </h2>
-          
-          <div className="space-y-4">
-            <div className="rounded-xl border border-border p-4">
-              <label className="mb-2 block text-sm font-medium text-foreground">
-                Bedrooms
-              </label>
-              <div className="flex items-center gap-3">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setBedrooms(Math.max(1, bedrooms - 1))}
-                  disabled={bedrooms <= 1}
-                >
-                  -
-                </Button>
-                <span className="w-12 text-center text-xl font-semibold">{bedrooms}</span>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setBedrooms(Math.min(10, bedrooms + 1))}
-                >
-                  +
-                </Button>
+            {/* Bathrooms */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Bathrooms</label>
+              <div className="flex items-center gap-2">
+                {[1, 2, 3, 4, 5].map(num => (
+                  <button
+                    key={num}
+                    onClick={() => setBathrooms(num)}
+                    className={cn(
+                      "flex h-12 w-12 items-center justify-center rounded-lg border-2 text-lg font-semibold transition-all",
+                      bathrooms === num
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border bg-background hover:border-primary/50"
+                    )}
+                  >
+                    {num}
+                  </button>
+                ))}
               </div>
             </div>
 
-            <div className="rounded-xl border border-border p-4">
-              <label className="mb-2 block text-sm font-medium text-foreground">
-                Bathrooms
-              </label>
-              <div className="flex items-center gap-3">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setBathrooms(Math.max(1, bathrooms - 1))}
-                  disabled={bathrooms <= 1}
-                >
-                  -
-                </Button>
-                <span className="w-12 text-center text-xl font-semibold">{bathrooms}</span>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setBathrooms(Math.min(10, bathrooms + 1))}
-                >
-                  +
-                </Button>
+            {/* Estimated Time */}
+            <div className="flex items-center justify-between rounded-lg bg-muted/50 p-3">
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">Estimated time</span>
               </div>
+              <span className="font-semibold text-foreground">{estimatedHours} hours</span>
             </div>
-          </div>
 
-          <div className="rounded-xl bg-muted/50 p-4 text-center">
-            <p className="text-sm text-muted-foreground">Estimated duration</p>
-            <p className="text-lg font-semibold text-foreground">{estimatedHours} hours</p>
+            <Button 
+              onClick={() => setCurrentStep(3)} 
+              className="w-full"
+            >
+              Next: Add Extras
+              <ChevronRight className="ml-1 h-4 w-4" />
+            </Button>
           </div>
+        ) : currentStep > 2 ? (
+          <p className="mt-1 text-sm text-muted-foreground">
+            {bedrooms} Bed, {bathrooms} Bath • ~{estimatedHours} hours
+          </p>
+        ) : null}
+      </div>
+    );
+  };
+
+  const renderAddOnsSection = () => {
+    if (isQuoteBased) return null;
+
+    return (
+      <div className={cn(
+        "rounded-xl border p-4 transition-all",
+        currentStep < 3 ? "border-muted bg-muted/30 opacity-50" : 
+        currentStep > 3 ? "border-muted bg-muted/30" : "border-border bg-card shadow-sm"
+      )}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {currentStep > 3 && (
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                <Check className="h-3.5 w-3.5" />
+              </div>
+            )}
+            <h3 className="font-semibold text-foreground">3. Any Extras?</h3>
+          </div>
+          {currentStep > 3 && (
+            <button 
+              onClick={() => setCurrentStep(3)} 
+              className="flex items-center gap-1 text-sm text-primary hover:underline"
+            >
+              <Edit2 className="h-3.5 w-3.5" /> Edit
+            </button>
+          )}
         </div>
-      )}
+        
+        {currentStep === 3 ? (
+          <div className="mt-4 space-y-4 animate-in slide-in-from-bottom-4 duration-300">
+            <div className="grid grid-cols-3 gap-2">
+              {ADD_ONS.map(addon => (
+                <button 
+                  key={addon.id}
+                  onClick={() => toggleAddOn(addon.id)}
+                  className={cn(
+                    "flex flex-col items-center gap-1 rounded-lg border-2 p-3 transition-all",
+                    selectedAddOns.includes(addon.id) 
+                      ? "border-primary bg-primary/10" 
+                      : "border-border bg-background hover:border-primary/50"
+                  )}
+                >
+                  <span className="text-2xl">{addon.icon}</span>
+                  <span className="text-xs font-medium text-foreground">{addon.label}</span>
+                  <span className="text-[10px] text-muted-foreground">+R{addon.price}</span>
+                </button>
+              ))}
+            </div>
 
-      {/* Step 3: Date & Time (only for instant book) */}
-      {step === 3 && !isQuoteBased && (
-        <div className="space-y-6">
-          <h2 className="text-center text-xl font-semibold text-foreground">
-            Pick a Date & Time
-          </h2>
+            <Button 
+              onClick={() => setCurrentStep(4)} 
+              className="w-full"
+            >
+              Next: Pick Date & Time
+              <ChevronRight className="ml-1 h-4 w-4" />
+            </Button>
+          </div>
+        ) : currentStep > 3 ? (
+          <p className="mt-1 text-sm text-muted-foreground">
+            {selectedAddOns.length === 0 
+              ? "No extras added" 
+              : selectedAddOns.map(id => ADD_ONS.find(a => a.id === id)?.label).join(", ")
+            }
+          </p>
+        ) : null}
+      </div>
+    );
+  };
 
-          <div className="space-y-4">
+  const renderDateTimeSection = () => {
+    if (isQuoteBased) return null;
+
+    return (
+      <div className={cn(
+        "rounded-xl border p-4 transition-all",
+        currentStep < 4 ? "border-muted bg-muted/30 opacity-50" : "border-border bg-card shadow-sm"
+      )}>
+        <div className="flex items-center gap-2">
+          <h3 className="font-semibold text-foreground">4. Pick Date & Time</h3>
+        </div>
+        
+        {currentStep === 4 ? (
+          <div className="mt-4 space-y-4 animate-in fade-in duration-300">
             <div>
               <label className="mb-2 block text-sm font-medium text-foreground">
                 Date
@@ -440,7 +534,7 @@ const CleaningWizard = () => {
                     mode="single"
                     selected={date}
                     onSelect={setDate}
-                    disabled={(date) => date < new Date()}
+                    disabled={(d) => d < new Date()}
                     initialFocus
                     className="pointer-events-auto"
                   />
@@ -466,67 +560,108 @@ const CleaningWizard = () => {
               </Select>
             </div>
           </div>
-        </div>
-      )}
+        ) : null}
+      </div>
+    );
+  };
 
-      {/* Price Display (only for instant book services) */}
-      {!isQuoteBased && (
-        <div className="rounded-xl bg-gradient-to-r from-primary/10 to-primary/5 p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">Total Price</p>
-              <p className="text-2xl font-bold text-primary">R{totalPrice}</p>
+  const renderQuoteSection = () => {
+    if (!isQuoteBased) return null;
+
+    return (
+      <div className={cn(
+        "rounded-xl border p-4 transition-all",
+        currentStep < 2 ? "border-muted bg-muted/30 opacity-50" : "border-border bg-card shadow-sm"
+      )}>
+        <div className="flex items-center gap-2">
+          <h3 className="font-semibold text-foreground">2. Request Details</h3>
+        </div>
+        
+        {currentStep === 2 ? (
+          <div className="mt-4 space-y-4 animate-in fade-in duration-300">
+            <div className="rounded-lg bg-muted/50 p-3">
+              <div className="flex items-center gap-3">
+                {selectedService && <selectedService.icon className="h-5 w-5 text-primary" />}
+                <div>
+                  <p className="text-sm font-medium text-foreground">{selectedService?.name}</p>
+                  <p className="text-xs text-muted-foreground">{selectedService?.description}</p>
+                </div>
+              </div>
             </div>
-            <div className="text-right text-sm text-muted-foreground">
-              {serviceType === "window_cleaning" ? (
-                <p>{estimatedHours} hrs × R{WINDOW_HOURLY_RATE}/hr</p>
-              ) : (
-                <>
-                  <p>Base: R{serviceType === "moving_cleaning" || serviceType === "one_time_cleaning" ? 235 : BASE_PRICE} (3 hrs)</p>
-                  {estimatedHours > 3 && (
-                    <p>+R{(estimatedHours - 3) * HOURLY_RATE} ({estimatedHours - 3} extra hrs)</p>
-                  )}
-                </>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-foreground">
+                Tell us about your requirements (optional)
+              </label>
+              <Textarea
+                value={specialRequirements}
+                onChange={(e) => setSpecialRequirements(e.target.value)}
+                placeholder="E.g., Size of space, frequency needed, specific requirements..."
+                rows={4}
+              />
+            </div>
+
+            <div className="rounded-lg bg-primary/10 p-3 text-center">
+              <p className="text-xs text-muted-foreground">We'll respond within</p>
+              <p className="font-semibold text-primary">2 hours</p>
+            </div>
+          </div>
+        ) : null}
+      </div>
+    );
+  };
+
+  const canSubmit = () => {
+    if (isQuoteBased) {
+      return currentStep === 2;
+    }
+    return currentStep === 4 && date && time;
+  };
+
+  return (
+    <div className="space-y-4 pb-28">
+      {renderServiceSection()}
+      {renderHomeSizeSection()}
+      {renderAddOnsSection()}
+      {renderDateTimeSection()}
+      {renderQuoteSection()}
+
+      {/* Sticky Price Footer */}
+      {serviceType && !isQuoteBased && currentStep > 1 && (
+        <div className="fixed bottom-16 left-0 right-0 z-40 border-t border-border bg-card p-4 shadow-lg md:bottom-0">
+          <div className="mx-auto flex max-w-lg items-center justify-between">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-tight text-muted-foreground">Total Price</p>
+              <p className="text-2xl font-black text-primary">R{totalPrice}</p>
+              {selectedAddOns.length > 0 && (
+                <p className="text-[10px] text-muted-foreground">
+                  Base: R{basePrice} + Extras: R{addOnsTotal}
+                </p>
               )}
             </div>
+            <Button 
+              size="lg" 
+              disabled={!canSubmit() || isSubmitting}
+              onClick={handleBookingSubmit}
+              className="bg-green-600 px-8 hover:bg-green-700"
+            >
+              {isSubmitting ? "Booking..." : "Book Now"}
+            </Button>
           </div>
         </div>
       )}
 
-      {/* Navigation */}
-      <div className="flex gap-3">
-        {step > 1 && (
-          <Button
-            variant="outline"
-            onClick={() => setStep(step - 1)}
-            className="flex-1"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
-          </Button>
-        )}
-        {step < totalSteps ? (
-          <Button
-            onClick={handleNext}
-            disabled={!canProceed()}
-            className="flex-1"
-          >
-            Next
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-        ) : (
-          <Button
-            onClick={handleSubmit}
-            disabled={!canProceed() || isSubmitting}
-            className="flex-1"
-          >
-            {isSubmitting 
-              ? (isQuoteBased ? "Submitting..." : "Booking...") 
-              : (isQuoteBased ? "Submit Quote Request" : "Confirm Booking")
-            }
-          </Button>
-        )}
-      </div>
+      {/* Quote Submit Button */}
+      {isQuoteBased && currentStep === 2 && (
+        <Button
+          className="w-full"
+          size="lg"
+          disabled={isSubmitting}
+          onClick={handleQuoteSubmit}
+        >
+          {isSubmitting ? "Submitting..." : "Submit Quote Request"}
+        </Button>
+      )}
     </div>
   );
 };
