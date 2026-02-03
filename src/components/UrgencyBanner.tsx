@@ -1,9 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Clock } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const UrgencyBanner = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const scrollToServices = () => {
     document.getElementById("services")?.scrollIntoView({ behavior: "smooth" });
@@ -24,13 +26,23 @@ const UrgencyBanner = () => {
               </p>
             </div>
           </div>
-          <Button 
-            onClick={scrollToServices}
-            size="sm"
-            className="shrink-0"
-          >
-            Book Now
-          </Button>
+          <div className="flex items-center gap-2 shrink-0">
+            <Button 
+              onClick={scrollToServices}
+              size="sm"
+            >
+              Book Now
+            </Button>
+            {!user && (
+              <Button 
+                onClick={() => navigate("/auth")}
+                size="sm"
+                variant="outline"
+              >
+                Sign In
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </div>
