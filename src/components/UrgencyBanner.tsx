@@ -30,6 +30,7 @@ const UrgencyBanner = () => {
             <Button 
               onClick={scrollToServices}
               size="sm"
+              className="transition-all duration-200 hover:scale-105 hover:shadow-md"
             >
               Book Now
             </Button>
@@ -38,6 +39,7 @@ const UrgencyBanner = () => {
                 onClick={() => navigate("/auth")}
                 size="sm"
                 variant="outline"
+                className="transition-all duration-200 hover:scale-105 hover:shadow-md"
               >
                 Sign In
               </Button>
