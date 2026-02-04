@@ -155,6 +155,32 @@ const CleaningWizard = () => {
 
       if (error) throw error;
 
+      // Send confirmation email
+      const addressParts = [
+        profile?.unit_number,
+        profile?.complex_name,
+        profile?.street_address,
+        profile?.suburb,
+        profile?.city,
+      ].filter(Boolean);
+
+      try {
+        await supabase.functions.invoke("send-booking-confirmation", {
+          body: {
+            email: user.email,
+            customerName: profile?.first_name || "Customer",
+            serviceName: selectedService?.name || serviceType,
+            date: format(date, "PPP"),
+            time,
+            address: addressParts.join(", "),
+            totalPrice: finalTotalPrice,
+          },
+        });
+      } catch (emailError) {
+        console.error("Email sending failed:", emailError);
+        // Don't fail the booking if email fails
+      }
+
       setBookingComplete(true);
     } catch (error) {
       console.error("Booking error:", error);
