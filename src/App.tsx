@@ -18,6 +18,7 @@ import WorkerDashboard from "./pages/WorkerDashboard";
 import CompleteProfile from "./pages/CompleteProfile";
 import PendingApproval from "./pages/PendingApproval";
 import WorkWithUs from "./pages/WorkWithUs";
+import ComingSoon from "./pages/ComingSoon";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/work-with-us" element={<WorkWithUs />} />
+            <Route path="/coming-soon" element={<ComingSoon />} />
             
             {/* Client Routes */}
             <Route 
