@@ -233,6 +233,27 @@ export type Database = {
         }
         Relationships: []
       }
+      waitlist_signups: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          service_type: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          service_type: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          service_type?: string
+        }
+        Relationships: []
+      }
       worker_applications: {
         Row: {
           additional_notes: string | null
