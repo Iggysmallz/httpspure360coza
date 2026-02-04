@@ -1,5 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 interface ServiceCardProps {
   title: string;
@@ -8,9 +9,10 @@ interface ServiceCardProps {
   onClick: () => void;
   className?: string;
   urgencyText?: string;
+  comingSoon?: boolean;
 }
 
-const ServiceCard = ({ title, description, icon: Icon, onClick, className, urgencyText }: ServiceCardProps) => {
+const ServiceCard = ({ title, description, icon: Icon, onClick, className, urgencyText, comingSoon }: ServiceCardProps) => {
   return (
     <button
       onClick={onClick}
@@ -22,6 +24,16 @@ const ServiceCard = ({ title, description, icon: Icon, onClick, className, urgen
         className
       )}
     >
+      {/* Coming Soon Badge */}
+      {comingSoon && (
+        <Badge 
+          variant="secondary" 
+          className="absolute top-3 right-3 bg-primary/10 text-primary border-primary/20"
+        >
+          Coming Soon
+        </Badge>
+      )}
+      
       {/* Gradient overlay on hover */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       

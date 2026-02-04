@@ -6,7 +6,10 @@ import {
   Home, 
   Truck, 
   Heart, 
-  Trash2 
+  Trash2,
+  Car,
+  Waves,
+  LayoutGrid
 } from "lucide-react";
 import Layout from "@/components/Layout";
 import Hero from "@/components/Hero";
@@ -71,6 +74,30 @@ const Index = () => {
       path: "/cleaning?type=bin",
       urgencyText: "Popular service — early booking recommended",
     },
+    {
+      title: "Car Wash",
+      description: "Convenient car wash services at your home or office.",
+      icon: Car,
+      path: "/coming-soon?service=car-wash",
+      urgencyText: "Launching soon",
+      comingSoon: true,
+    },
+    {
+      title: "Pool Cleaning",
+      description: "Professional pool cleaning and maintenance services.",
+      icon: Waves,
+      path: "/coming-soon?service=pool-cleaning",
+      urgencyText: "Launching soon",
+      comingSoon: true,
+    },
+    {
+      title: "Window Cleaning",
+      description: "Crystal-clear windows inside and out.",
+      icon: LayoutGrid,
+      path: "/coming-soon?service=window-cleaning",
+      urgencyText: "Launching soon",
+      comingSoon: true,
+    },
   ];
 
   const scrollToServices = () => {
@@ -101,12 +128,13 @@ const Index = () => {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {services.map((service) => (
               <ServiceCard
-                key={service.path}
+                key={service.path + service.title}
                 title={service.title}
                 description={service.description}
                 icon={service.icon}
                 onClick={() => navigate(service.path)}
                 urgencyText={service.urgencyText}
+                comingSoon={service.comingSoon}
               />
             ))}
           </div>
