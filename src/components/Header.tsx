@@ -101,7 +101,7 @@ const Header = () => {
             </Button>
           )}
           
-          {user ? (
+          {user && (
             <div className="flex items-center gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -151,14 +151,6 @@ const Header = () => {
                 <span className="hidden sm:inline ml-1.5">Logout</span>
               </Button>
             </div>
-          ) : (
-            <Button
-              onClick={() => navigate("/auth")}
-              size="sm"
-              className="rounded-lg font-medium"
-            >
-              Sign In
-            </Button>
           )}
         </div>
       </div>
