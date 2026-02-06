@@ -11,18 +11,14 @@ import UrgencyBanner from "@/components/UrgencyBanner";
 const Index = () => {
   const navigate = useNavigate();
 
-  const scrollToServices = () => {
+  const handleRequestQuote = () => {
     navigate("/services");
-  };
-
-  const handleWorkWithUs = () => {
-    navigate("/work-with-us");
   };
 
   return (
     <Layout>
       <UrgencyBanner />
-      <Hero onBookService={scrollToServices} onWorkWithUs={handleWorkWithUs} />
+      <Hero onRequestQuote={handleRequestQuote} />
 
       {/* Why Choose Us Section */}
       <WhyChooseUs />
