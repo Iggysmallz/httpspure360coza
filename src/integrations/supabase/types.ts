@@ -260,8 +260,11 @@ export type Database = {
           area: string
           contact_number: string
           created_at: string
+          cv_url: string | null
           full_name: string
           id: string
+          id_document_url: string | null
+          profile_picture_url: string | null
           status: string
           updated_at: string
           work_type: string
@@ -272,8 +275,11 @@ export type Database = {
           area: string
           contact_number: string
           created_at?: string
+          cv_url?: string | null
           full_name: string
           id?: string
+          id_document_url?: string | null
+          profile_picture_url?: string | null
           status?: string
           updated_at?: string
           work_type: string
@@ -284,8 +290,11 @@ export type Database = {
           area?: string
           contact_number?: string
           created_at?: string
+          cv_url?: string | null
           full_name?: string
           id?: string
+          id_document_url?: string | null
+          profile_picture_url?: string | null
           status?: string
           updated_at?: string
           work_type?: string
