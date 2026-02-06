@@ -23,45 +23,6 @@ const Index = () => {
       {/* Why Choose Us Section */}
       <WhyChooseUs />
 
-      {/* Positioning Section */}
-      <section className="px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl text-center">
-          <h2 className="mb-4 text-2xl font-bold text-foreground sm:text-3xl">
-            More than a booking platform.
-          </h2>
-          <p className="text-lg leading-relaxed text-muted-foreground">
-            PURE360 doesn't just connect you to workers — we manage the service. 
-            Our team handles coordination, quality checks and customer support so 
-            you can enjoy peace of mind.
-          </p>
-        </div>
-      </section>
-
-      {/* Trust Section */}
-      <section className="bg-muted/30 px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-4xl text-center">
-          <h3 className="mb-6 text-xl font-semibold text-foreground">
-            Trusted by Cape Town Families
-          </h3>
-          <div className="flex flex-wrap items-center justify-center gap-8">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-primary">500+</div>
-              <div className="text-sm text-muted-foreground">Happy Clients</div>
-            </div>
-            <div className="h-12 w-px bg-border" />
-            <div className="text-center">
-              <div className="text-3xl font-bold text-primary">4.9★</div>
-              <div className="text-sm text-muted-foreground">Average Rating</div>
-            </div>
-            <div className="h-12 w-px bg-border" />
-            <div className="text-center">
-              <div className="text-3xl font-bold text-primary">24hr</div>
-              <div className="text-sm text-muted-foreground">Response Time</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Contact Section */}
       <ContactSection />
 
