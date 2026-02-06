@@ -1,11 +1,15 @@
 import { Button } from "@/components/ui/button";
-import { MessageCircle, FileText } from "lucide-react";
+import { MessageCircle, FileText, UserPlus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface HeroProps {
   onRequestQuote: () => void;
 }
 
 const Hero = ({ onRequestQuote }: HeroProps) => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const whatsappNumber = "27764002332";
 
   const handleWhatsApp = () => {
@@ -39,23 +43,36 @@ const Hero = ({ onRequestQuote }: HeroProps) => {
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 animate-fade-in" style={{ animationDelay: "0.2s" }}>
-          <Button
-            onClick={handleWhatsApp}
-            size="lg"
-            className="h-12 w-full sm:w-auto gap-2.5 rounded-xl px-7 text-base font-semibold shadow-lg shadow-primary/20"
-          >
-            <MessageCircle className="h-5 w-5" />
-            WhatsApp to Book
-          </Button>
-          <Button
-            onClick={onRequestQuote}
-            variant="outline"
-            size="lg"
-            className="h-12 w-full sm:w-auto gap-2.5 rounded-xl px-7 text-base font-semibold border-2"
-          >
-            <FileText className="h-5 w-5" />
-            Request a Quote
-          </Button>
+          {user ? (
+            <>
+              <Button
+                onClick={handleWhatsApp}
+                size="lg"
+                className="h-12 w-full sm:w-auto gap-2.5 rounded-xl px-7 text-base font-semibold shadow-lg shadow-primary/20"
+              >
+                <MessageCircle className="h-5 w-5" />
+                WhatsApp to Book
+              </Button>
+              <Button
+                onClick={onRequestQuote}
+                variant="outline"
+                size="lg"
+                className="h-12 w-full sm:w-auto gap-2.5 rounded-xl px-7 text-base font-semibold border-2"
+              >
+                <FileText className="h-5 w-5" />
+                Request a Quote
+              </Button>
+            </>
+          ) : (
+            <Button
+              onClick={() => navigate("/auth")}
+              size="lg"
+              className="h-12 w-full sm:w-auto gap-2.5 rounded-xl px-7 text-base font-semibold shadow-lg shadow-primary/20"
+            >
+              <UserPlus className="h-5 w-5" />
+              Sign Up to Get Started
+            </Button>
+          )}
         </div>
       </div>
     </section>
