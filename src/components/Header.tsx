@@ -62,10 +62,7 @@ const Header = () => {
             Our Services
           </button>
           <button
-            onClick={() => {
-              navigate("/");
-              setTimeout(() => document.getElementById("services")?.scrollIntoView({ behavior: "smooth" }), 100);
-            }}
+            onClick={() => navigate("/services")}
             className="px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground rounded-md hover:bg-muted"
           >
             Book a Service
