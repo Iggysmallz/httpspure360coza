@@ -150,7 +150,7 @@ const ChatBot = () => {
       <Button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "fixed bottom-20 right-20 z-50 h-14 w-14 rounded-full p-0 shadow-lg md:bottom-6",
+          "fixed bottom-[9.5rem] right-4 z-50 h-14 w-14 rounded-full p-0 shadow-lg md:bottom-6 md:right-20",
           isOpen ? "bg-destructive hover:bg-destructive/90" : "bg-primary hover:bg-primary/90"
         )}
         aria-label={isOpen ? "Close chat" : "Open chat"}
@@ -160,7 +160,7 @@ const ChatBot = () => {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-36 right-4 z-50 w-[calc(100%-2rem)] max-w-md rounded-xl border border-border bg-background shadow-2xl md:bottom-24">
+        <div className="fixed bottom-[13.5rem] right-4 z-50 w-[calc(100%-2rem)] max-w-md rounded-xl border border-border bg-background shadow-2xl md:bottom-24">
           {/* Header */}
           <div className="flex items-center justify-between rounded-t-xl bg-primary px-4 py-3">
             <div className="flex items-center gap-2">
