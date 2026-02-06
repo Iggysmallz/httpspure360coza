@@ -113,7 +113,7 @@ export default function CheckoutSummary({ bookingData, onPay, isLoading }: Check
       </div>
 
       {/* Fixed Payment Footer */}
-      <div className="fixed bottom-16 left-0 right-0 z-50 border-t bg-card p-4 shadow-lg md:bottom-0">
+      <div className="fixed bottom-20 left-0 right-0 z-50 border-t bg-card p-4 shadow-lg md:bottom-0">
         <div className="mx-auto max-w-md space-y-2">
           <Button
             onClick={onPay}

@@ -727,7 +727,7 @@ const CleaningWizard = () => {
 
       {/* Sticky Price Footer - hide on checkout step */}
       {serviceType && !isQuoteBased && currentStep > 1 && currentStep < 5 && (
-        <div className="fixed bottom-16 left-0 right-0 z-40 border-t border-border bg-card p-4 shadow-lg md:bottom-0">
+        <div className="fixed bottom-20 left-0 right-0 z-40 border-t border-border bg-card p-4 shadow-lg md:bottom-0">
           <div className="mx-auto flex max-w-lg items-center justify-between">
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-tight text-muted-foreground">Total Price</p>
