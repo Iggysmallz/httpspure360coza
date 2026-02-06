@@ -42,7 +42,7 @@ const PricingCard = ({ title, icon: Icon, pricingItems, path }: PricingCardProps
           size="sm"
           className="w-full"
         >
-          Request Quote
+          Book Now
         </Button>
       </CardContent>
     </Card>
