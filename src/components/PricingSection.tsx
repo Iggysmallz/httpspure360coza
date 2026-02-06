@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { SprayCan, Sparkles, Home, TreeDeciduous, Truck, Trash2, Zap } from "lucide-react";
+import { SprayCan, Truck } from "lucide-react";
 import { LucideIcon } from "lucide-react";
 
 interface PricingItem {
@@ -61,31 +61,6 @@ const PricingSection = () => {
       path: "/cleaning?type=home",
     },
     {
-      title: "Deep & Moving Cleaning",
-      icon: Sparkles,
-      pricingItems: [
-        { label: "Deep clean", price: "From R580" },
-        { label: "Move-in/out", price: "From R780" },
-      ],
-      path: "/cleaning?type=deep",
-    },
-    {
-      title: "Airbnb & Short-Stay",
-      icon: Home,
-      pricingItems: [
-        { label: "Per turnover", price: "From R180" },
-      ],
-      path: "/cleaning?type=airbnb",
-    },
-    {
-      title: "Outdoor & Garden",
-      icon: TreeDeciduous,
-      pricingItems: [
-        { label: "Per hour", price: "From R220" },
-      ],
-      path: "/cleaning?type=outdoor",
-    },
-    {
       title: "Rubble & Furniture Removal",
       icon: Truck,
       pricingItems: [
@@ -94,24 +69,6 @@ const PricingSection = () => {
         { label: "Large load", price: "From R1,280" },
       ],
       path: "/removals",
-    },
-    {
-      title: "Bin Cleaning",
-      icon: Trash2,
-      pricingItems: [
-        { label: "Once-off", price: "R180/bin" },
-        { label: "Monthly", price: "R440" },
-      ],
-      path: "/cleaning?type=bin",
-    },
-    {
-      title: "Express / Quick Tasks",
-      icon: Zap,
-      pricingItems: [
-        { label: "Weekdays", price: "From R180" },
-        { label: "Weekends", price: "From R260" },
-      ],
-      path: "/cleaning?type=express",
     },
   ];
 
