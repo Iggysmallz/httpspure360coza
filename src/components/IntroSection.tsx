@@ -9,14 +9,14 @@ const IntroSection = () => {
         </h2>
         <p className="mb-8 text-sm leading-relaxed text-muted-foreground sm:text-base">
           PURE360 is a professional home and property services company that takes the stress out of maintaining your space. 
-          Every job is carried out by trained, company-managed staff — not random freelancers — so you always get consistent, reliable results. 
+          Every job is carried out by our in-house team or vetted partner professionals — all trained and supervised by PURE360 — so you always get consistent, reliable results. 
           We handle the vetting, scheduling and quality checks, so you don't have to worry about a thing.
         </p>
 
         <div className="grid grid-cols-3 gap-4">
           {[
             { icon: ShieldCheck, label: "Vetted & Trained Staff" },
-            { icon: Users, label: "Company-Managed Teams" },
+            { icon: Users, label: "In-house & Partner Teams" },
             { icon: Star, label: "Quality Guaranteed" },
           ].map((item) => (
             <div key={item.label} className="flex flex-col items-center gap-2">
