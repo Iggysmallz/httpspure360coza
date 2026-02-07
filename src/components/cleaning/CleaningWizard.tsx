@@ -574,6 +574,7 @@ const CleaningWizard = () => {
                       if (d < today) return true;
                       if (d.getTime() === today.getTime()) return true;
                       if (d.getTime() === tomorrow.getTime() && now.getHours() >= 20) return true;
+                      if (d.getDay() === 0) return true; // No Sundays
                       return false;
                     }}
                     initialFocus
