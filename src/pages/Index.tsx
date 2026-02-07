@@ -10,25 +10,25 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 import UrgencyBanner from "@/components/UrgencyBanner";
 import ServiceAreaSection from "@/components/ServiceAreaSection";
 import HowItWorks from "@/components/HowItWorks";
-import BookingCTA from "@/components/booking/BookingCTA";
 
 
 const Index = () => {
   const navigate = useNavigate();
 
+  const handleRequestQuote = () => {
+    navigate("/services");
+  };
+
   return (
     <Layout>
       <UrgencyBanner />
-      <Hero />
+      <Hero onRequestQuote={handleRequestQuote} />
       <IntroSection />
       <OurServices />
       <HowItWorks />
 
       {/* Why Choose Us Section */}
       <WhyChooseUs />
-
-      {/* Booking CTA */}
-      <BookingCTA />
 
       {/* Service Area */}
       <ServiceAreaSection />
