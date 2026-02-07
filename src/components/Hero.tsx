@@ -54,7 +54,7 @@ const Hero = ({ onRequestQuote }: HeroProps) => {
             className="h-12 w-full sm:w-auto gap-2.5 rounded-xl px-7 text-base font-semibold border-2"
           >
             <FileText className="h-5 w-5" />
-            Request a Quote
+            Book Now
           </Button>
         </div>
       </div>
