@@ -9,9 +9,9 @@ const reasons = [
   },
   {
     icon: Building2,
-    title: "Company-Managed Teams",
+    title: "In-house & Partner Teams",
     description:
-      "Our staff are employed and supervised by PURE360 — not random freelancers. You get accountability and consistency every time.",
+      "Our services are delivered by a combination of in-house staff and vetted partner professionals — all trained and supervised by PURE360. You get accountability and consistency every time.",
   },
   {
     icon: FileText,

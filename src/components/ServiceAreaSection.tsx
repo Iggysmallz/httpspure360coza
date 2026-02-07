@@ -39,7 +39,7 @@ const ServiceAreaSection = () => {
                 Expanding Nationwide
               </h3>
               <p className="text-sm leading-relaxed text-muted-foreground">
-                We have a structured plan to expand into other provinces over time — bringing the same standard of vetted, company-managed service to more communities across South Africa.
+                We have a structured plan to expand into other provinces over time — bringing the same standard of vetted, professionally supervised service to more communities across South Africa.
               </p>
             </div>
           </div>
