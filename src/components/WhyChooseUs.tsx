@@ -21,9 +21,9 @@ const reasons = [
   },
   {
     icon: Headphones,
-    title: "Real Support When You Need It",
+    title: "We're Here to Help",
     description:
-      "If something isn't right, our support team is a WhatsApp message away — and we'll fix it fast.",
+      "Have a question or concern? Our team is always available and ready to assist.",
   },
 ];
 
