@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import Hero from "@/components/Hero";
 import IntroSection from "@/components/IntroSection";
+import OurServices from "@/components/OurServices";
 import WhyChooseUs from "@/components/WhyChooseUs";
 import ContactSection from "@/components/ContactSection";
 import WhatsAppButton from "@/components/WhatsAppButton";
@@ -21,6 +22,7 @@ const Index = () => {
       <UrgencyBanner />
       <Hero onRequestQuote={handleRequestQuote} />
       <IntroSection />
+      <OurServices />
 
       {/* Why Choose Us Section */}
       <WhyChooseUs />
