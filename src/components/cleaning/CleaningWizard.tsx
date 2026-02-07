@@ -53,12 +53,12 @@ const TIME_SLOTS = [
 ];
 
 // Updated pricing (R15 cheaper)
-const BASE_PRICE = 285;
+const BASE_PRICE = 350;
 const HOURLY_RATE = 65;
 const WINDOW_HOURLY_RATE = 50;
 
 const calculateHours = (bedrooms: number, bathrooms: number): number => {
-  return 3 + Math.max(0, bedrooms - 2) + Math.max(0, bathrooms - 1);
+  return 6 + Math.max(0, bedrooms - 2) + Math.max(0, bathrooms - 1);
 };
 
 const calculatePrice = (bedrooms: number, bathrooms: number, serviceType: string): number => {
@@ -68,10 +68,10 @@ const calculatePrice = (bedrooms: number, bathrooms: number, serviceType: string
   }
   if (serviceType === "moving_cleaning" || serviceType === "one_time_cleaning") {
     const hours = calculateHours(bedrooms, bathrooms);
-    return 235 + Math.max(0, hours - 3) * HOURLY_RATE;
+    return 235 + Math.max(0, hours - 6) * HOURLY_RATE;
   }
   const hours = calculateHours(bedrooms, bathrooms);
-  return BASE_PRICE + Math.max(0, hours - 3) * HOURLY_RATE;
+  return BASE_PRICE + Math.max(0, hours - 6) * HOURLY_RATE;
 };
 
 const CleaningWizard = () => {
