@@ -1,12 +1,6 @@
-import { ShieldCheck, Building2, FileText, ClipboardCheck, Headphones } from "lucide-react";
+import { Building2, FileText, ClipboardCheck, Headphones } from "lucide-react";
 
 const reasons = [
-  {
-    icon: ShieldCheck,
-    title: "Trained & Vetted Staff",
-    description:
-      "Every team member is background-checked, reference-verified and professionally trained before they enter your home.",
-  },
   {
     icon: Building2,
     title: "In-house & Partner Teams",
