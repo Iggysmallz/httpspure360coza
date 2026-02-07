@@ -8,6 +8,7 @@ import WhyChooseUs from "@/components/WhyChooseUs";
 import ContactSection from "@/components/ContactSection";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import UrgencyBanner from "@/components/UrgencyBanner";
+import ServiceAreaSection from "@/components/ServiceAreaSection";
 
 
 const Index = () => {
@@ -26,6 +27,9 @@ const Index = () => {
 
       {/* Why Choose Us Section */}
       <WhyChooseUs />
+
+      {/* Service Area */}
+      <ServiceAreaSection />
 
       {/* Contact Section */}
       <ContactSection />
