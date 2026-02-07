@@ -14,6 +14,75 @@ export type Database = {
   }
   public: {
     Tables: {
+      booking_requests: {
+        Row: {
+          accessibility_notes: string | null
+          admin_notes: string | null
+          cleaning_type: string | null
+          contact_number: string
+          created_at: string
+          email: string | null
+          full_name: string
+          id: string
+          item_types: string | null
+          load_size: string | null
+          number_of_rooms: string | null
+          preferred_date: string | null
+          preferred_time_window: string | null
+          property_type: string | null
+          service_address: string
+          service_type: string
+          special_instructions: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          accessibility_notes?: string | null
+          admin_notes?: string | null
+          cleaning_type?: string | null
+          contact_number: string
+          created_at?: string
+          email?: string | null
+          full_name: string
+          id?: string
+          item_types?: string | null
+          load_size?: string | null
+          number_of_rooms?: string | null
+          preferred_date?: string | null
+          preferred_time_window?: string | null
+          property_type?: string | null
+          service_address: string
+          service_type: string
+          special_instructions?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          accessibility_notes?: string | null
+          admin_notes?: string | null
+          cleaning_type?: string | null
+          contact_number?: string
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          item_types?: string | null
+          load_size?: string | null
+          number_of_rooms?: string | null
+          preferred_date?: string | null
+          preferred_time_window?: string | null
+          property_type?: string | null
+          service_address?: string
+          service_type?: string
+          special_instructions?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           bathrooms: number

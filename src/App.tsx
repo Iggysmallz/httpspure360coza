@@ -20,6 +20,7 @@ import PendingApproval from "./pages/PendingApproval";
 import WorkWithUs from "./pages/WorkWithUs";
 import ComingSoon from "./pages/ComingSoon";
 import Services from "./pages/Services";
+import Book from "./pages/Book";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
             <Route path="/work-with-us" element={<WorkWithUs />} />
             <Route path="/coming-soon" element={<ComingSoon />} />
             <Route path="/services" element={<Services />} />
+            <Route path="/book" element={<Book />} />
             
             {/* Client Routes */}
             <Route 

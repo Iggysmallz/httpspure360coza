@@ -1,11 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { MessageCircle, FileText } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-interface HeroProps {
-  onRequestQuote: () => void;
-}
-
-const Hero = ({ onRequestQuote }: HeroProps) => {
+const Hero = () => {
+  const navigate = useNavigate();
   const whatsappNumber = "27764002332";
 
   const handleWhatsApp = () => {
@@ -48,7 +46,7 @@ const Hero = ({ onRequestQuote }: HeroProps) => {
             WhatsApp to Book
           </Button>
           <Button
-            onClick={onRequestQuote}
+            onClick={() => navigate("/book")}
             variant="outline"
             size="lg"
             className="h-12 w-full sm:w-auto gap-2.5 rounded-xl px-7 text-base font-semibold border-2"
