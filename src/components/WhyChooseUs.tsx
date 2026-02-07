@@ -17,7 +17,7 @@ const reasons = [
     icon: ClipboardCheck,
     title: "Quality You Can Count On",
     description:
-      "We follow up after every job to make sure you're happy with the results. If something's not right, we'll sort it out.",
+      "We take pride in delivering a high standard of work and always welcome your feedback to keep improving.",
   },
   {
     icon: Headphones,
