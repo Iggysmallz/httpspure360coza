@@ -565,7 +565,17 @@ const CleaningWizard = () => {
                     mode="single"
                     selected={date}
                     onSelect={setDate}
-                    disabled={(d) => d < new Date()}
+                    disabled={(d) => {
+                      const now = new Date();
+                      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                      const tomorrow = new Date(today);
+                      tomorrow.setDate(tomorrow.getDate() + 1);
+                      // Block past dates, and block tomorrow if it's past 8pm
+                      if (d < today) return true;
+                      if (d.getTime() === today.getTime()) return true;
+                      if (d.getTime() === tomorrow.getTime() && now.getHours() >= 20) return true;
+                      return false;
+                    }}
                     initialFocus
                     className="pointer-events-auto"
                   />
