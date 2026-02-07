@@ -15,9 +15,9 @@ const reasons = [
   },
   {
     icon: ClipboardCheck,
-    title: "Quality Checks & Follow-Ups",
+    title: "Quality You Can Count On",
     description:
-      "Supervisors inspect completed work and we follow up after every job to make sure you're 100% satisfied.",
+      "We follow up after every job to make sure you're happy with the results. If something's not right, we'll sort it out.",
   },
   {
     icon: Headphones,
