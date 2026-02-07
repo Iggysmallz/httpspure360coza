@@ -53,7 +53,7 @@ const TIME_SLOTS = [
 ];
 
 // Updated pricing (R15 cheaper)
-const BASE_PRICE = 350;
+const BASE_PRICE = 320;
 const HOURLY_RATE = 65;
 const WINDOW_HOURLY_RATE = 50;
 
@@ -70,8 +70,10 @@ const calculatePrice = (bedrooms: number, bathrooms: number, serviceType: string
     const hours = calculateHours(bedrooms, bathrooms);
     return 235 + Math.max(0, hours - 6) * HOURLY_RATE;
   }
-  const hours = calculateHours(bedrooms, bathrooms);
-  return BASE_PRICE + Math.max(0, hours - 6) * HOURLY_RATE;
+  // Base price R320 for 1-2 bedrooms, 1 bathroom
+  const extraBedroomCost = Math.max(0, bedrooms - 2) * HOURLY_RATE;
+  const extraBathroomCost = Math.max(0, bathrooms - 1) * HOURLY_RATE;
+  return BASE_PRICE + extraBedroomCost + extraBathroomCost;
 };
 
 const CleaningWizard = () => {
