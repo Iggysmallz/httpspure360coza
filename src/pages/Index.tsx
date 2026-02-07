@@ -9,6 +9,7 @@ import ContactSection from "@/components/ContactSection";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import UrgencyBanner from "@/components/UrgencyBanner";
 import ServiceAreaSection from "@/components/ServiceAreaSection";
+import HowItWorks from "@/components/HowItWorks";
 
 
 const Index = () => {
@@ -24,6 +25,7 @@ const Index = () => {
       <Hero onRequestQuote={handleRequestQuote} />
       <IntroSection />
       <OurServices />
+      <HowItWorks />
 
       {/* Why Choose Us Section */}
       <WhyChooseUs />
