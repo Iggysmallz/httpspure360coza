@@ -429,6 +429,16 @@ const CleaningWizard = () => {
               <span className="font-semibold text-foreground">{estimatedHours} hours</span>
             </div>
 
+            {/* Multi-staff notice for 6+ bedrooms */}
+            {bedrooms >= 6 && (
+              <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 text-sm text-foreground">
+                <p className="font-medium">🏠 Large home detected</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  You may need more than 1 staff member. We'll confirm the team size and final price before your booking.
+                </p>
+              </div>
+            )}
+
             <Button 
               onClick={() => setCurrentStep(3)} 
               className="w-full"
