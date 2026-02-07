@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, ChevronLeft, ShieldCheck, Lock } from "lucide-react";
+import { ChevronRight, ChevronLeft, ShieldCheck, Lock, LogIn } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -49,23 +49,6 @@ const Book = () => {
     accessibilityNotes: "",
   });
 
-  if (!user) {
-    return (
-      <Layout>
-        <div className="mx-auto max-w-md px-4 py-16 text-center">
-          <Lock className="mx-auto mb-4 h-10 w-10 text-muted-foreground" />
-          <h2 className="mb-2 text-xl font-bold text-foreground">Sign in to Book</h2>
-          <p className="mb-6 text-muted-foreground">
-            Please sign in or create an account to submit a booking request.
-          </p>
-          <Button onClick={() => navigate("/auth")} className="w-full">
-            Sign In / Register
-          </Button>
-        </div>
-      </Layout>
-    );
-  }
-
   if (isComplete) {
     return (
       <Layout>
@@ -87,6 +70,15 @@ const Book = () => {
   };
 
   const handleSubmit = async () => {
+    if (!user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in or create an account to submit your booking.",
+      });
+      navigate("/auth");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const { error } = await supabase.from("booking_requests").insert({
@@ -226,6 +218,14 @@ const Book = () => {
               className="ml-auto gap-1"
             >
               Next <ChevronRight className="h-4 w-4" />
+            </Button>
+          ) : !user ? (
+            <Button
+              onClick={() => navigate("/auth")}
+              className="ml-auto gap-2"
+            >
+              <LogIn className="h-4 w-4" />
+              Sign In to Submit
             </Button>
           ) : (
             <Button
