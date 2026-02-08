@@ -4,15 +4,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
-import { CheckCircle, XCircle, Clock, User, MapPin, FileText, Download } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Separator } from "@/components/ui/separator";
+import { CheckCircle, XCircle, Clock, User, MapPin, FileText, Download, Phone, Briefcase, Calendar } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
@@ -37,7 +31,6 @@ const WorkerApplicationsTable = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedApp, setSelectedApp] = useState<WorkerApplication | null>(null);
-  const [adminNotes, setAdminNotes] = useState("");
 
   const { data: applications, isLoading } = useQuery({
     queryKey: ["worker-applications"],
@@ -59,10 +52,12 @@ const WorkerApplicationsTable = () => {
         .eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["worker-applications"] });
       toast({ title: "Success", description: "Application status updated" });
-      setSelectedApp(null);
+      if (selectedApp) {
+        setSelectedApp({ ...selectedApp, status: variables.status });
+      }
     },
     onError: () => {
       toast({ title: "Error", description: "Failed to update status", variant: "destructive" });
@@ -148,55 +143,131 @@ const WorkerApplicationsTable = () => {
         </CardContent>
       </Card>
 
-      <Dialog open={!!selectedApp} onOpenChange={() => setSelectedApp(null)}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Application Details</DialogTitle>
-            <DialogDescription>Review this worker application</DialogDescription>
-          </DialogHeader>
+      <Sheet open={!!selectedApp} onOpenChange={() => setSelectedApp(null)}>
+        <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Application Details</SheetTitle>
+            <SheetDescription>Full worker application review</SheetDescription>
+          </SheetHeader>
 
           {selectedApp && (
-            <div className="space-y-4">
-              <div className="flex justify-center">
-                <Avatar className="h-20 w-20">
+            <div className="mt-6 space-y-6">
+              {/* Profile Picture */}
+              <div className="flex flex-col items-center gap-3">
+                <Avatar className="h-28 w-28">
                   <AvatarImage src={selectedApp.profile_picture_url || ""} />
-                  <AvatarFallback><User className="h-10 w-10" /></AvatarFallback>
+                  <AvatarFallback><User className="h-14 w-14" /></AvatarFallback>
                 </Avatar>
+                <div className="text-center">
+                  <h3 className="text-xl font-semibold">{selectedApp.full_name}</h3>
+                  <div className="mt-1">{getStatusBadge(selectedApp.status)}</div>
+                </div>
               </div>
 
-              <div className="text-center">
-                <h3 className="text-lg font-semibold">{selectedApp.full_name}</h3>
-                {getStatusBadge(selectedApp.status)}
-              </div>
+              <Separator />
 
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between"><span className="text-muted-foreground">Contact:</span><span>{selectedApp.contact_number}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Work Type:</span><span className="capitalize">{selectedApp.work_type}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Experience:</span><span>{selectedApp.years_experience || "Not specified"}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Area:</span><span className="text-right max-w-[200px]">{selectedApp.area}</span></div>
+              {/* Details */}
+              <div className="space-y-4">
+                <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Personal Details</h4>
+                <div className="grid gap-3">
+                  <div className="flex items-start gap-3">
+                    <Phone className="h-4 w-4 mt-0.5 text-muted-foreground" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Contact Number</p>
+                      <p className="font-medium">{selectedApp.contact_number}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <MapPin className="h-4 w-4 mt-0.5 text-muted-foreground" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Area</p>
+                      <p className="font-medium">{selectedApp.area}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Briefcase className="h-4 w-4 mt-0.5 text-muted-foreground" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Work Type</p>
+                      <p className="font-medium capitalize">{selectedApp.work_type}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Calendar className="h-4 w-4 mt-0.5 text-muted-foreground" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Experience</p>
+                      <p className="font-medium">{selectedApp.years_experience || "Not specified"}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Clock className="h-4 w-4 mt-0.5 text-muted-foreground" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Applied On</p>
+                      <p className="font-medium">{format(new Date(selectedApp.created_at), "dd MMMM yyyy, HH:mm")}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {selectedApp.additional_notes && (
-                <div>
-                  <p className="text-sm font-medium mb-1">Additional Notes</p>
-                  <p className="text-sm text-muted-foreground">{selectedApp.additional_notes}</p>
-                </div>
+                <>
+                  <Separator />
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Additional Notes</h4>
+                    <p className="text-sm whitespace-pre-wrap rounded-lg bg-muted p-3">{selectedApp.additional_notes}</p>
+                  </div>
+                </>
               )}
 
-              <div className="flex gap-2">
+              <Separator />
+
+              {/* Attachments */}
+              <div className="space-y-3">
+                <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Attachments</h4>
+
+                {selectedApp.profile_picture_url && (
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">Profile Picture</p>
+                    <img
+                      src={selectedApp.profile_picture_url}
+                      alt="Profile"
+                      className="w-full max-h-64 object-contain rounded-lg border bg-muted"
+                    />
+                  </div>
+                )}
+
                 {selectedApp.cv_url && (
-                  <a href={selectedApp.cv_url} target="_blank" rel="noopener noreferrer">
-                    <Button variant="outline" size="sm"><Download className="mr-1 h-3 w-3" /> CV</Button>
+                  <a href={selectedApp.cv_url} target="_blank" rel="noopener noreferrer" className="block">
+                    <div className="flex items-center gap-3 rounded-lg border p-3 hover:bg-muted transition-colors">
+                      <Download className="h-5 w-5 text-primary" />
+                      <div>
+                        <p className="font-medium text-sm">CV / Resume</p>
+                        <p className="text-xs text-muted-foreground">Click to download</p>
+                      </div>
+                    </div>
                   </a>
                 )}
+
                 {selectedApp.id_document_url && (
-                  <a href={selectedApp.id_document_url} target="_blank" rel="noopener noreferrer">
-                    <Button variant="outline" size="sm"><FileText className="mr-1 h-3 w-3" /> ID Doc</Button>
+                  <a href={selectedApp.id_document_url} target="_blank" rel="noopener noreferrer" className="block">
+                    <div className="flex items-center gap-3 rounded-lg border p-3 hover:bg-muted transition-colors">
+                      <FileText className="h-5 w-5 text-primary" />
+                      <div>
+                        <p className="font-medium text-sm">ID Document</p>
+                        <p className="text-xs text-muted-foreground">Click to download</p>
+                      </div>
+                    </div>
                   </a>
+                )}
+
+                {!selectedApp.cv_url && !selectedApp.id_document_url && !selectedApp.profile_picture_url && (
+                  <p className="text-sm text-muted-foreground">No attachments uploaded</p>
                 )}
               </div>
 
-              <div className="flex gap-2">
+              <Separator />
+
+              {/* Actions */}
+              <div className="flex gap-2 pb-4">
                 {selectedApp.status !== "approved" && (
                   <Button className="flex-1" onClick={() => updateStatus.mutate({ id: selectedApp.id, status: "approved" })} disabled={updateStatus.isPending}>
                     <CheckCircle className="mr-2 h-4 w-4" /> Approve
@@ -210,8 +281,8 @@ const WorkerApplicationsTable = () => {
               </div>
             </div>
           )}
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
     </>
   );
 };
