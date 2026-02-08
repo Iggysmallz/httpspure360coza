@@ -27,6 +27,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import BookingsTable from "@/components/admin/BookingsTable";
 import QuotesTable from "@/components/admin/QuotesTable";
+import WorkerApplicationsTable from "@/components/admin/WorkerApplicationsTable";
 import { 
   Shield, 
   Loader2, 
@@ -269,8 +270,12 @@ const Admin = () => {
             </div>
           </div>
 
-          <Tabs defaultValue="workers" className="w-full">
-            <TabsList className="mb-4 grid w-full grid-cols-3">
+          <Tabs defaultValue="applications" className="w-full">
+            <TabsList className="mb-4 grid w-full grid-cols-4">
+              <TabsTrigger value="applications" className="gap-2">
+                <FileText className="h-4 w-4" />
+                Applications
+              </TabsTrigger>
               <TabsTrigger value="workers" className="gap-2">
                 <Users className="h-4 w-4" />
                 Workers
@@ -287,6 +292,11 @@ const Admin = () => {
                 Quotes ({quotes.length})
               </TabsTrigger>
             </TabsList>
+
+            {/* Applications Tab */}
+            <TabsContent value="applications">
+              <WorkerApplicationsTable />
+            </TabsContent>
 
             {/* Workers Tab */}
             <TabsContent value="workers">
