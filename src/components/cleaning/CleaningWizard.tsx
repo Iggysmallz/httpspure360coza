@@ -65,15 +65,14 @@ const calculatePrice = (bedrooms: number, bathrooms: number, serviceType: string
     return 179;
   }
   if (serviceType === "deep_clean") {
-    // Deep Clean: from R380, scales with size
     const extraBedroomCost = Math.max(0, bedrooms - 2) * HOURLY_RATE;
     const extraBathroomCost = Math.max(0, bathrooms - 1) * HOURLY_RATE;
     return 380 + extraBedroomCost + extraBathroomCost;
   }
   // Standard Home Clean tiers
-  if (bedrooms <= 2) return 230;
-  if (bedrooms === 3) return 280;
-  return 330; // 4+ bedrooms
+  if (bedrooms <= 2) return 320;
+  if (bedrooms === 3) return 370;
+  return 420; // 4+ bedrooms
 };
 
 const CleaningWizard = () => {
