@@ -52,28 +52,28 @@ const TIME_SLOTS = [
   "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00"
 ];
 
-// Updated pricing (R15 cheaper)
-const BASE_PRICE = 320;
+// Tier-based pricing matching PricingSection
 const HOURLY_RATE = 65;
-const WINDOW_HOURLY_RATE = 50;
 
 const calculateHours = (bedrooms: number, bathrooms: number): number => {
   return 6 + Math.max(0, bedrooms - 2) + Math.max(0, bathrooms - 1);
 };
 
 const calculatePrice = (bedrooms: number, bathrooms: number, serviceType: string): number => {
-  if (serviceType === "window_cleaning") {
-    const hours = calculateHours(bedrooms, bathrooms);
-    return hours * WINDOW_HOURLY_RATE;
+  if (serviceType === "express_cleaning") {
+    // Express Clean: R179 Mon-Thu, R279 Fri-Sun (use base R179, day check at checkout)
+    return 179;
   }
-  if (serviceType === "moving_cleaning" || serviceType === "one_time_cleaning") {
-    const hours = calculateHours(bedrooms, bathrooms);
-    return 235 + Math.max(0, hours - 6) * HOURLY_RATE;
+  if (serviceType === "deep_clean") {
+    // Deep Clean: from R380, scales with size
+    const extraBedroomCost = Math.max(0, bedrooms - 2) * HOURLY_RATE;
+    const extraBathroomCost = Math.max(0, bathrooms - 1) * HOURLY_RATE;
+    return 380 + extraBedroomCost + extraBathroomCost;
   }
-  // Base price R320 for 1-2 bedrooms, 1 bathroom
-  const extraBedroomCost = Math.max(0, bedrooms - 2) * HOURLY_RATE;
-  const extraBathroomCost = Math.max(0, bathrooms - 1) * HOURLY_RATE;
-  return BASE_PRICE + extraBedroomCost + extraBathroomCost;
+  // Standard Home Clean tiers
+  if (bedrooms <= 2) return 230;
+  if (bedrooms === 3) return 280;
+  return 330; // 4+ bedrooms
 };
 
 const CleaningWizard = () => {
