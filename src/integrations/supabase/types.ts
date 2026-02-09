@@ -326,6 +326,7 @@ export type Database = {
       worker_applications: {
         Row: {
           additional_notes: string | null
+          admin_notes: string | null
           area: string
           contact_number: string
           created_at: string
@@ -341,6 +342,7 @@ export type Database = {
         }
         Insert: {
           additional_notes?: string | null
+          admin_notes?: string | null
           area: string
           contact_number: string
           created_at?: string
@@ -356,6 +358,7 @@ export type Database = {
         }
         Update: {
           additional_notes?: string | null
+          admin_notes?: string | null
           area?: string
           contact_number?: string
           created_at?: string

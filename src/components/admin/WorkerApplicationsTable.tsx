@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
-import { CheckCircle, XCircle, Clock, User, MapPin, FileText, Download, Phone, Briefcase, Calendar } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { CheckCircle, XCircle, Clock, User, MapPin, FileText, Download, Phone, Briefcase, Calendar, MessageSquare, Save, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
@@ -25,12 +26,14 @@ interface WorkerApplication {
   id_document_url: string | null;
   profile_picture_url: string | null;
   created_at: string;
+  admin_notes: string | null;
 }
 
 const WorkerApplicationsTable = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedApp, setSelectedApp] = useState<WorkerApplication | null>(null);
+  const [adminNotes, setAdminNotes] = useState("");
 
   const { data: applications, isLoading } = useQuery({
     queryKey: ["worker-applications"],
@@ -61,6 +64,26 @@ const WorkerApplicationsTable = () => {
     },
     onError: () => {
       toast({ title: "Error", description: "Failed to update status", variant: "destructive" });
+    },
+  });
+
+  const saveNotes = useMutation({
+    mutationFn: async ({ id, notes }: { id: string; notes: string }) => {
+      const { error } = await supabase
+        .from("worker_applications")
+        .update({ admin_notes: notes })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["worker-applications"] });
+      toast({ title: "Success", description: "Notes saved" });
+      if (selectedApp) {
+        setSelectedApp({ ...selectedApp, admin_notes: adminNotes });
+      }
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to save notes", variant: "destructive" });
     },
   });
 
@@ -131,7 +154,7 @@ const WorkerApplicationsTable = () => {
                     <TableCell className="text-sm">{format(new Date(app.created_at), "dd MMM yyyy")}</TableCell>
                     <TableCell>{getStatusBadge(app.status)}</TableCell>
                     <TableCell>
-                      <Button variant="outline" size="sm" onClick={() => setSelectedApp(app)}>
+                      <Button variant="outline" size="sm" onClick={() => { setSelectedApp(app); setAdminNotes(app.admin_notes || ""); }}>
                         View
                       </Button>
                     </TableCell>
@@ -262,6 +285,30 @@ const WorkerApplicationsTable = () => {
                 {!selectedApp.cv_url && !selectedApp.id_document_url && !selectedApp.profile_picture_url && (
                   <p className="text-sm text-muted-foreground">No attachments uploaded</p>
                 )}
+              </div>
+
+              <Separator />
+
+              {/* Admin Notes */}
+              <div className="space-y-3">
+                <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4" /> Admin Notes
+                </h4>
+                <Textarea
+                  placeholder="Add internal notes about this applicant..."
+                  value={adminNotes}
+                  onChange={(e) => setAdminNotes(e.target.value)}
+                  rows={4}
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => saveNotes.mutate({ id: selectedApp.id, notes: adminNotes })}
+                  disabled={saveNotes.isPending}
+                >
+                  {saveNotes.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                  Save Notes
+                </Button>
               </div>
 
               <Separator />
