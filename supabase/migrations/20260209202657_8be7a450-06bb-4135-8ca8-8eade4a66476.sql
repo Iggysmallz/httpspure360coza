@@ -1,0 +1,1 @@
+ALTER TABLE public.worker_applications ADD COLUMN admin_notes text DEFAULT NULL;
