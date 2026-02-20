@@ -21,6 +21,7 @@ import WorkWithUs from "./pages/WorkWithUs";
 import ComingSoon from "./pages/ComingSoon";
 import Services from "./pages/Services";
 import NotFound from "./pages/NotFound";
+import Login from "./pages/Login";
 
 const queryClient = new QueryClient();
 
@@ -52,7 +53,8 @@ const App = () => (
             <Route path="/care" element={<Care />} />
             <Route path="/bookings" element={<Bookings />} />
             <Route path="/profile" element={<Profile />} />
-            
+            <Route path="/login" element={<Login />} />
+
             {/* Worker Routes */}
             <Route 
               path="/worker-dashboard" 
