@@ -129,36 +129,26 @@ const CleaningWizard = () => {
     setIsSubmitting(true);
     try {
       const { error } = await supabase.from("bookings").insert({
-        user_id: user.id,
+        customer_id: user.id,
         service_type: serviceType,
-        bedrooms,
-        bathrooms,
-        scheduled_date: format(date, "yyyy-MM-dd"),
-        scheduled_time: time,
-        total_price: finalTotalPrice,
+        date: format(date, "yyyy-MM-dd"),
+        time_slot: time,
+        requirements: { bedrooms, bathrooms, total_price: finalTotalPrice },
+        addons: selectedAddOns,
+        matching_type: "auto",
         status: "pending",
       });
 
       if (error) throw error;
 
-      // Send confirmation email
-      const addressParts = [
-        profile?.unit_number,
-        profile?.complex_name,
-        profile?.street_address,
-        profile?.suburb,
-        profile?.city,
-      ].filter(Boolean);
-
       try {
         await supabase.functions.invoke("send-booking-confirmation", {
           body: {
             email: user.email,
-            customerName: profile?.first_name || "Customer",
+            customerName: profile?.full_name || "Customer",
             serviceName: selectedService?.name || serviceType,
             date: format(date, "PPP"),
             time,
-            address: addressParts.join(", "),
             totalPrice: finalTotalPrice,
           },
         });
@@ -644,9 +634,9 @@ const CleaningWizard = () => {
       basePrice,
       extrasPrice: addOnsTotal,
       selectedExtras,
-      unit: profile?.unit_number || "",
-      street: profile?.street_address || "",
-      suburb: profile?.suburb || "",
+      unit: "",
+      street: "",
+      suburb: "",
       date: date ? format(date, "PPP") : "",
       time,
     };
@@ -715,12 +705,6 @@ const CleaningWizard = () => {
 
   // Show confirmation page after successful booking
   if (bookingComplete) {
-    const addressParts = [
-      profile?.unit_number,
-      profile?.street_address,
-      profile?.suburb,
-    ].filter(Boolean);
-
     return (
       <BookingConfirmation
         bookingDetails={{
@@ -728,7 +712,6 @@ const CleaningWizard = () => {
           date: date ? format(date, "PPP") : "",
           time,
           totalPrice: finalTotalPrice,
-          address: addressParts.length > 0 ? addressParts.join(", ") : undefined,
         }}
       />
     );
