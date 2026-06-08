@@ -11,7 +11,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { validatePassword } from "@/lib/passwordValidation";
 import PasswordStrengthMeter from "@/components/auth/PasswordStrengthMeter";
 import RoleSelector from "@/components/auth/RoleSelector";
-import { lovable } from "@/integrations/lovable";
 import logo from "@/assets/logo.png";
 
 type SelectedRole = "client" | "worker";
@@ -38,29 +37,14 @@ const Auth = () => {
   const checkUserRole = async () => {
     if (!user) return;
 
-    const { data: roleData } = await supabase
-      .from("user_roles")
+    const { data: profile } = await supabase
+      .from("profiles")
       .select("role")
-      .eq("user_id", user.id)
+      .eq("id", user.id)
       .maybeSingle();
 
-    if (roleData?.role === "admin") {
-      navigate("/admin");
-    } else if (roleData?.role === "worker") {
-      // Check if profile is complete
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("profile_completed, worker_status")
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-      if (!profile?.profile_completed) {
-        navigate("/complete-profile");
-      } else if (profile.worker_status !== "approved") {
-        navigate("/pending-approval");
-      } else {
-        navigate("/worker-dashboard");
-      }
+    if (profile?.role === "worker") {
+      navigate("/worker-dashboard");
     } else {
       navigate("/client-dashboard");
     }
@@ -114,7 +98,7 @@ const Auth = () => {
 
 
         // Sign up user
-        const { error: signUpError } = await signUp(email, password);
+        const { data: signUpData, error: signUpError } = await signUp(email, password);
         if (signUpError) {
           toast({
             title: "Sign up failed",
@@ -125,8 +109,7 @@ const Auth = () => {
           return;
         }
 
-        // Wait for auth to complete
-        const { data: { user: newUser } } = await supabase.auth.getUser();
+        const newUser = signUpData?.user;
         if (!newUser) {
           toast({
             title: "Sign up failed",
@@ -137,47 +120,17 @@ const Auth = () => {
           return;
         }
 
-        // Create user role
-        const { error: roleError } = await supabase
-          .from("user_roles")
-          .insert({
-            user_id: newUser.id,
+        // Create profile with correct column names
+        const { error: profileError } = await supabase
+          .from("profiles")
+          .upsert({
+            id: newUser.id,
+            full_name: `${firstName.trim()} ${lastName.trim()}`,
             role: selectedRole,
           });
 
-        if (roleError) {
-          console.error("Role creation error:", roleError);
-        }
-
-        // Create profile
-        if (selectedRole === "client") {
-          const { error: profileError } = await supabase
-            .from("profiles")
-            .insert({
-              user_id: newUser.id,
-              first_name: firstName.trim(),
-              last_name: lastName.trim(),
-              profile_completed: true,
-            });
-
-          if (profileError) {
-            console.error("Profile creation error:", profileError);
-          }
-        } else {
-          // Worker - don't set address yet, they'll complete profile
-          const { error: profileError } = await supabase
-            .from("profiles")
-            .insert({
-              user_id: newUser.id,
-              first_name: firstName.trim(),
-              last_name: lastName.trim(),
-              worker_status: "pending_approval",
-              profile_completed: false,
-            });
-
-          if (profileError) {
-            console.error("Profile creation error:", profileError);
-          }
+        if (profileError) {
+          console.error("Profile creation error:", profileError);
         }
 
         toast({
@@ -336,8 +289,9 @@ const Auth = () => {
                 className="mt-4 w-full gap-2"
                 onClick={async () => {
                   setIsGoogleLoading(true);
-                  const { error } = await lovable.auth.signInWithOAuth("google", {
-                    redirect_uri: window.location.origin,
+                  const { error } = await supabase.auth.signInWithOAuth({
+                    provider: "google",
+                    options: { redirectTo: window.location.origin },
                   });
                   if (error) {
                     toast({
