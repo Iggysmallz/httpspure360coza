@@ -21,10 +21,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      async (_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+        // Ensure profile exists for this user
+        if (session?.user) {
+          await supabase.from("profiles").upsert(
+            { id: session.user.id },
+            { onConflict: "id", ignoreDuplicates: true }
+          );
+        }
       }
     );
 
