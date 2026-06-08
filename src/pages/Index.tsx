@@ -10,6 +10,7 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 import UrgencyBanner from "@/components/UrgencyBanner";
 import ServiceAreaSection from "@/components/ServiceAreaSection";
 import HowItWorks from "@/components/HowItWorks";
+import PriceEstimator from "@/components/PriceEstimator";
 
 
 const Index = () => {
@@ -25,6 +26,7 @@ const Index = () => {
       <Hero onRequestQuote={handleRequestQuote} />
       <IntroSection />
       <OurServices />
+      <PriceEstimator />
       <HowItWorks />
 
       {/* Why Choose Us Section */}
